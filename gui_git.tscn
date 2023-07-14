@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3 uid="uid://egqkcmaef51t"]
+
+[ext_resource type="Script" path="res://gui_git.gd" id="1_p5pk2"]
+
+[node name="gui-git" type="CanvasLayer"]
+script = ExtResource("1_p5pk2")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="output" type="RichTextLabel" parent="Panel"]
+custom_minimum_size = Vector2(456, 456)
+offset_left = 178.0
+offset_top = 82.0
+offset_right = 218.0
+offset_bottom = 122.0
+text = "test words"
