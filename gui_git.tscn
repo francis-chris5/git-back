@@ -14,8 +14,8 @@ grow_vertical = 2
 
 [node name="output" type="RichTextLabel" parent="Panel"]
 custom_minimum_size = Vector2(456, 456)
-offset_left = 178.0
-offset_top = 82.0
-offset_right = 218.0
-offset_bottom = 122.0
-text = "test words"
+layout_mode = 0
+offset_left = 390.0
+offset_top = 78.0
+offset_right = 846.0
+offset_bottom = 534.0
