@@ -78,6 +78,7 @@ offset_left = 10.0
 offset_top = 85.0
 offset_right = 210.0
 offset_bottom = 535.0
+theme_override_constants/separation = 10
 
 [node name="checkout_controls" type="Button" parent="application/control_options"]
 layout_mode = 2

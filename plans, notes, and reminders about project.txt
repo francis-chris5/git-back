@@ -1,0 +1,23 @@
+
+Git-Back Version Control Interface Application
+
+
+
+Virtual Reality Interface:
+
+	Checkout
+		the branches will be like boxes
+		the commits will be like pieces of paper in the boxes
+
+		grabbing and pulling out a piece of paper checks out that commit
+
+			putting it back in the same box will return from detached head state
+
+			putting it in a new box will create a new branch from that checkout
+
+
+
+
+Important Notes & Things to Look Into:
+
+	stash is being used internally by software (when checking out a previous commit it immediately adds and stashes all files then pops index 0 from stash upon returning from detached head state --DOES NOT RECOVER THEM IN NEW BRANCH SCENARIO YET--). Could this cause problems with existing stashes in the repository

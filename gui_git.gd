@@ -1,7 +1,7 @@
 extends CanvasLayer
 
-#var path := "C:/Users/franc/Documents/delete/git-back"
 var path := "."
+var terminal = "powershell.exe"
 
 var current_branch = ""
 var current_commit = ""
@@ -46,9 +46,6 @@ var commit_logs = []
 
 
 func _ready():
-	#scan_history()
-	#get_commits()
-	#checkout_commit()
 	btnOpen.pressed.connect(func(): open_repository())
 	btnClone.pressed.connect(func(): toggle_clone_repository())
 	btnCloneLocation.pressed.connect(func(): choose_location())
@@ -67,11 +64,24 @@ func _process(delta):
 ## end _process()
 
 
-func open_repository():
-	## find a way to search for folder
-			## tk.askfiledialog --> write to file in "user://repo_path.txt" then read from there
+func run_git_command(command, locale=""):
+	if locale == "":
+		locale = path
 	var results := []
-	var path_dialog = OS.execute("powershell.exe", ["python open_repository.py"], results)
+	var git_command := OS.execute("powershell.exe", ["cd " + locale + "; " + command], results)
+	return results
+## end run_git_command()
+
+
+func run_other_command(command):
+	var results := []
+	var path_dialog = OS.execute(terminal, [command], results)
+	return results
+## end run_other_command()
+
+
+func open_repository():
+	var results = run_other_command("python open_repository.py")
 	if results[0] == "not a repository\r\n":
 		path = "."
 	else:
@@ -111,14 +121,13 @@ func choose_location():
 	if txtCloneURL.text == "":
 		pass
 	else:
-		var results := []
-		var set_location := OS.execute("powershell.exe", ["python choose_location.py"], results)
+		var results = run_other_command("python choose_location.py")
 		var locale = ""
 		if results[0] == "invalid\r\n":
 			locale = "C:/"
 		else:
 			locale = results[0].rstrip("\r\n")
-		var clone_repo := OS.execute("powershell.exe", ["cd " + locale + "; git clone " + txtCloneURL.text], results)
+		results = run_git_command("git clone " + txtCloneURL.text, locale)
 		if "fatal" not in results[0]:
 			var repo_name = ""
 			var repo = txtCloneURL.text.split("/")
@@ -127,10 +136,10 @@ func choose_location():
 			else:
 				repo_name = repo[len(repo)-1]
 			path = locale + "/" + repo_name
-			print(path)
 			scan_history()
 			txtCloneURL.text = ""
-			clone_panel.visible = false
+			toggle_clone_repository()
+			view_checkout_panel()
 ## end choose_location()
 
 
@@ -149,14 +158,12 @@ func scan_history():
 
 
 func get_branches():
-	var results := []
-	var get_branches := OS.execute("powershell.exe", ["cd " + path + "; git branch -a"], results)
+	var results = run_git_command("git branch -a")
 	var branches = results[0].split("\n")
 	branches.remove_at(len(branches)-1)
 	var i : int = 0
 	for b in branches:
 		b = b.lstrip(" ")
-		#if "remotes/" not in b:
 		var btnBranch = Button.new()
 		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		if b[0] == "*":
@@ -165,14 +172,12 @@ func get_branches():
 			current_branch = str(b)
 		btnBranch.text = str(b)
 		btnBranch.pressed.connect(func(): switch_branch(b, btnBranch))
-		btnBranch.size = Vector2(200, 45)
-		btnBranch.position = Vector2(16, 90 + i)
-		i += 55
 		branch_buttons.append(btnBranch)
 	for bb in branch_buttons:
 		if bb != null:
 			branch_container.add_child(bb)
 ## end get_branches()
+
 
 
 func clear_branches():
@@ -182,10 +187,10 @@ func clear_branches():
 ## end clear_branches()
 
 
+
 func get_commits():
-	var results := []
-	##var get_hashes := OS.execute("powershell.exe", ["git log --pretty=format:%h"], results)
-	var get_hashes := OS.execute("powershell.exe", ["cd " + path + "; git log --oneline"], results)
+	## KEEP THIS TO COPY LATER ##var get_hashes := OS.execute("powershell.exe", ["git log --pretty=format:%h"], results)
+	var results = run_git_command("git log --oneline")
 	var hashes = results[0].split("\n")
 	hashes.remove_at(len(hashes)-1)
 	var i : int = 0
@@ -196,14 +201,12 @@ func get_commits():
 		var hash = h.split(" ")[0]
 		current_commit = hash
 		btnHash.pressed.connect(func(): checkout_commit(hash, btnHash))
-		btnHash.size = Vector2(200, 45)
-		btnHash.position = Vector2(5, 5 + i)
-		i += 55
 		commit_buttons.append(btnHash)
 	for cb in commit_buttons:
 		if cb != null:
 			commit_container.add_child(cb)
 ## end get_commits()
+
 
 
 func clear_commits():
@@ -213,43 +216,34 @@ func clear_commits():
 ## end clear_commits()
 
 
+
 func checkout_commit(hash, button):
 	for cb in commit_buttons:
 		if cb != null:
 			cb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 	if "HEAD detached" in txtStatus.text:
-		var reattach := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + current_commit])
-		var pop_stack := OS.execute("powershell.exe", ["cd " + path + "; git stash pop"])
+		run_git_command("git checkout " + current_commit)
+		run_git_command("git stash pop")
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 	txtCommit.text = ""
-	var results := []
-	#var commits := OS.execute("powershell.exe", ["cd " + path + "; git log " + hash], results)
-	var stage_files := OS.execute("powershell.exe", ["cd " + path + "; git add ."])
-	var push_stack := OS.execute("powershell.exe", ["cd " + path + "; git stash"])
-	var commits := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + hash], results)
+	run_git_command("git add .")
+	run_git_command("git stash")
+	var results = run_git_command("git checkout " + hash)
 	txtCommit.text = results[0]
 	clear_commits()
 	get_commits()
 	open_log()
 	show_diff(hash)
 	update_status()
-#	var logs = results[0].split("commit")
-#	for l in logs:
-#		l = l.lstrip(" ")
-#		txtCommit.text += l + "\n"
-#		commit_logs.append(l)
 ## end checkout_commit()
 
 
+
 func clear_detatched():
-	var clear_detatched := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + current_branch])
-#	clear_commits()
-#	get_commits()
-#	open_log()
-#	show_diff(current_commit)
-#	update_status()
+	run_git_command("git checkout " + current_branch)
 	scan_history()
 ## end clear_detatched()
+
 
 
 func branch_detatched():
@@ -258,46 +252,34 @@ func branch_detatched():
 		branch_name = current_commit
 	else:
 		branch_name = txtBranchName.text
-	var new_branch := OS.execute("powershell.exe", ["cd " + path + "; git switch -c " + branch_name])
-#	clear_commits()
-#	get_commits()
-#	open_log()
-#	show_diff(current_commit)
-#	update_status()
+	run_git_command("git switch -c " + branch_name)
 	scan_history()
 ## end branch_detatched()
 
 
+
 func open_log():
-	var results := []
-	var current_log = OS.execute("powershell.exe", ["cd " + path + "; git log"], results)
+	var results = run_git_command("git log")
 	txtCommit.text = results[0]
 ## end open_log()
+
+
 
 func switch_branch(branch_name, button):
 	for bb in branch_buttons:
 		if bb != null:
 			bb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
-	var results := []
-	var checkout_branch := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + branch_name], results)
+	var results = run_git_command("git checkout " + branch_name)
 	if "fatal" not in results[0]:
 		current_branch = branch_name
-#	clear_commits()
-#	txtCommit.text = ""
-#	txtStatus.text = ""
-#	txtDiff.text = ""
-#	get_commits()
-#	update_status()
-#	show_diff()
 	scan_history()
 ## end switch_branch()
 
 
 
 func update_status():
-	var results := []
-	var current_status := OS.execute("powershell.exe", ["cd " + path + "; git status"], results)
+	var results = run_git_command("git status")
 	txtStatus.text = ""
 	txtStatus.text = results[0]
 	if "HEAD detached" in results[0]:
@@ -310,14 +292,15 @@ func update_status():
 
 
 
-func show_diff(hash=""):
-	var results := []
-	if hash == "":
-		var commit_diff := OS.execute("powershell.exe", ["cd " + path + "; git diff"], results)
-	else:
-		var commit_diff := OS.execute("powershell.exe", ["cd " + path + "; git diff " + hash + "^!"], results)
+func show_diff(hash="", branches=[]):
+	var results = []
+	if hash != "":
+		results = run_git_command("git diff " + hash + "^!")
+	if len(branches):
+		results = run_git_command("git diff " + branches[0] + " " + branches[1])
 	txtDiff.text = ""
-	txtDiff.text = results[0]
+	if len(results) > 0:
+		txtDiff.text = results[0]
 ## end show_diff()
 
 
