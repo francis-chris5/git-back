@@ -7,9 +7,14 @@ var branch_buttons = []
 var commit_buttons = []
 var commit_logs = []
 
-@onready var btnOpen = $Panel/open
+@onready var btnOpen = $Panel/main_menu/open
 @onready var btnScan = $Panel/scan
-@onready var txtOutput = $Panel/output
+@onready var txtCommit = $Panel/commit_log
+@onready var txtStatus = $Panel/status
+@onready var txtDiff = $Panel/diff
+@onready var commit_container = $Panel/commits/commit_container
+@onready var branch_container = $Panel/branches/branch_container
+
 
 
 func _ready():
@@ -41,9 +46,14 @@ func open_repository():
 func scan_history():
 	clear_branches()
 	clear_commits()
-	txtOutput.text = ""
+	txtCommit.text = ""
+	txtStatus.text = ""
+	txtDiff.text = ""
 	get_branches()
 	get_commits()
+	update_txtStatus()
+	open_log()
+	show_diff()
 ## end scan_history()
 
 
@@ -68,7 +78,7 @@ func get_branches():
 		branch_buttons.append(btnBranch)
 	for bb in branch_buttons:
 		if bb != null:
-			add_child(bb)
+			branch_container.add_child(bb)
 ## end get_branches()
 
 
@@ -93,12 +103,12 @@ func get_commits():
 		var id = h.split(" ")[0]
 		btnHash.pressed.connect(func(): get_logs(id, btnHash))
 		btnHash.size = Vector2(200, 45)
-		btnHash.position = Vector2(232, 90 + i)
+		btnHash.position = Vector2(5, 5 + i)
 		i += 55
 		commit_buttons.append(btnHash)
 	for cb in commit_buttons:
 		if cb != null:
-			add_child(cb)
+			commit_container.add_child(cb)
 ## end get_commits()
 
 
@@ -114,15 +124,24 @@ func get_logs(hash, button):
 		if cb != null:
 			cb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
-	txtOutput.text = ""
+	txtCommit.text = ""
 	var results := []
 	var commits := OS.execute("powershell.exe", ["cd " + path + "; git log " + hash], results)
-	var logs = results[0].split("commit")
-	for l in logs:
-		l = l.lstrip(" ")
-		txtOutput.text += l + "\n"
-		commit_logs.append(l)
+	txtCommit.text = results[0]
+	show_diff(hash)
+#	var logs = results[0].split("commit")
+#	for l in logs:
+#		l = l.lstrip(" ")
+#		txtCommit.text += l + "\n"
+#		commit_logs.append(l)
 ## end get_logs()
+
+
+func open_log():
+	var results := []
+	var current_log = OS.execute("powershell.exe", ["cd " + path + "; git log"], results)
+	txtCommit.text = results[0]
+## end open_log()
 
 func switch_branch(branch_name, button):
 	for bb in branch_buttons:
@@ -132,9 +151,35 @@ func switch_branch(branch_name, button):
 	var results := []
 	var current_branch := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + branch_name], results)
 	clear_commits()
-	txtOutput.text = ""
+	txtCommit.text = ""
+	txtStatus.text = ""
+	txtDiff.text = ""
 	get_commits()
+	update_txtStatus()
+	show_diff()
 ## end switch_branch()
+
+
+
+func update_txtStatus():
+	var results := []
+	var current_status := OS.execute("powershell.exe", ["cd " + path + "; git status"], results)
+	txtStatus.text = ""
+	txtStatus.text = results[0]
+## end get_txtStatus()
+
+
+
+func show_diff(hash=""):
+	var results := []
+	if hash == "":
+		var commit_diff := OS.execute("powershell.exe", ["cd " + path + "; git diff"], results)
+	else:
+		var commit_diff := OS.execute("powershell.exe", ["cd " + path + "; git diff " + hash + "^!"], results)
+	txtDiff.text = ""
+	txtDiff.text = results[0]
+## end show_diff()
+
 
 
 
