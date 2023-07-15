@@ -10,29 +10,28 @@ var branch_buttons = []
 var commit_buttons = []
 var commit_logs = []
 
-@onready var btnOpen = $Panel/main_menu/open
-@onready var btnClone = $Panel/main_menu/clone
+@onready var btnOpen = $application/main_menu/open
+@onready var btnClone = $application/main_menu/clone
 
 
-@onready var clone_panel = $Panel/clone_panel
-@onready var btnCloneLocation = $Panel/clone_panel/clone_location
-@onready var txtCloneURL = $Panel/clone_panel/clone_url
+@onready var clone_panel = $application/clone_panel
+@onready var btnCloneLocation = $application/clone_panel/clone_location
+@onready var txtCloneURL = $application/clone_panel/clone_url
 
 
-@onready var txtCommit = $Panel/commit_log
-@onready var txtStatus = $Panel/status
-@onready var txtDiff = $Panel/diff
+@onready var btnCheckoutControls = $application/control_options/checkout_controls
+@onready var checkout_panel = $application/checkout_panel
 
 
-@onready var commit_container = $Panel/commits/commit_container
-@onready var branch_container = $Panel/branches/branch_container
+@onready var txtCommit = $application/checkout_panel/commit_log
+@onready var txtStatus = $application/checkout_panel/status
+@onready var txtDiff = $application/checkout_panel/diff
 
-@onready var btnCommitTools = $Panel/tools/commit_tools
-@onready var btnBranchTools = $Panel/tools/branch_tools
-@onready var checkout_commit_tools = $Panel/checkout_commit_tools
-@onready var checkout_branch_tools = $Panel/checkout_branch_tools
+@onready var commit_container = $application/checkout_panel/commits/commit_container
+@onready var branch_container = $application/checkout_panel/branches/branch_container
 
-@onready var btnClearDetatched = $Panel/checkout_commit_tools/clear_detatched
+@onready var btnClearDetatched = $application/checkout_panel/clear_detatched
+
 
 
 
@@ -45,8 +44,9 @@ func _ready():
 	btnOpen.pressed.connect(func(): open_repository())
 	btnClone.pressed.connect(func(): toggle_clone_repository())
 	btnCloneLocation.pressed.connect(func(): choose_location())
-	btnBranchTools.pressed.connect(func(): toggle_branch_tools())
-	btnCommitTools.pressed.connect(func(): toggle_commit_tools())
+	
+	btnCheckoutControls.pressed.connect(func(): view_checkout_panel())
+	
 	btnClearDetatched.pressed.connect(func(): clear_detatched())
 ## end _ready()
 
@@ -65,6 +65,7 @@ func open_repository():
 		path = "."
 	else:
 		path = results[0]
+	view_checkout_panel()
 	scan_history()
 ## end open_repository()
 
@@ -74,14 +75,10 @@ func toggle_clone_repository():
 ## end clone_repository()
 
 
-func toggle_branch_tools():
-	checkout_branch_tools.visible = not checkout_branch_tools.visible
-## end toggle_branch_tools()
-
-
-func toggle_commit_tools():
-	checkout_commit_tools.visible = not checkout_commit_tools.visible
-## end toggle_commit_tools()
+func view_checkout_panel():
+	checkout_panel.visible = true
+	## set other panels to false here once they exist
+## end toggle_checkout_panel()
 
 
 func choose_location():
@@ -133,6 +130,7 @@ func get_branches():
 	var i : int = 0
 	for b in branches:
 		b = b.lstrip(" ")
+		#if "remotes/" not in b:
 		var btnBranch = Button.new()
 		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		if b[0] == "*":
@@ -193,7 +191,7 @@ func checkout_commit(hash, button):
 	for cb in commit_buttons:
 		if cb != null:
 			cb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
-	if "HEAD detatched" in txtStatus.text:
+	if "HEAD detached" in txtStatus.text:
 		var reattach := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + current_commit])
 		var pop_stack := OS.execute("powershell.exe", ["cd " + path + "; git stash pop"])
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
@@ -256,6 +254,10 @@ func update_status():
 	var current_status := OS.execute("powershell.exe", ["cd " + path + "; git status"], results)
 	txtStatus.text = ""
 	txtStatus.text = results[0]
+	if "HEAD detached" in results[0]:
+		btnClearDetatched.visible = true
+	else:
+		btnClearDetatched.visible = false
 ## end get_txtStatus()
 
 
