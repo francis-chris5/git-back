@@ -3,6 +3,9 @@ extends CanvasLayer
 #var path := "C:/Users/franc/Documents/delete/git-back"
 var path := "."
 
+var current_branch = ""
+var current_commit = ""
+
 var branch_buttons = []
 var commit_buttons = []
 var commit_logs = []
@@ -24,16 +27,27 @@ var commit_logs = []
 @onready var commit_container = $Panel/commits/commit_container
 @onready var branch_container = $Panel/branches/branch_container
 
+@onready var btnCommitTools = $Panel/tools/commit_tools
+@onready var btnBranchTools = $Panel/tools/branch_tools
+@onready var checkout_commit_tools = $Panel/checkout_commit_tools
+@onready var checkout_branch_tools = $Panel/checkout_branch_tools
+
+@onready var btnClearDetatched = $Panel/checkout_commit_tools/clear_detatched
+
+
 
 
 
 func _ready():
 	#scan_history()
 	#get_commits()
-	#get_logs()
+	#checkout_commit()
 	btnOpen.pressed.connect(func(): open_repository())
 	btnClone.pressed.connect(func(): toggle_clone_repository())
 	btnCloneLocation.pressed.connect(func(): choose_location())
+	btnBranchTools.pressed.connect(func(): toggle_branch_tools())
+	btnCommitTools.pressed.connect(func(): toggle_commit_tools())
+	btnClearDetatched.pressed.connect(func(): clear_detatched())
 ## end _ready()
 
 
@@ -58,6 +72,16 @@ func open_repository():
 func toggle_clone_repository():
 	clone_panel.visible = not clone_panel.visible
 ## end clone_repository()
+
+
+func toggle_branch_tools():
+	checkout_branch_tools.visible = not checkout_branch_tools.visible
+## end toggle_branch_tools()
+
+
+func toggle_commit_tools():
+	checkout_commit_tools.visible = not checkout_commit_tools.visible
+## end toggle_commit_tools()
 
 
 func choose_location():
@@ -114,6 +138,7 @@ func get_branches():
 		if b[0] == "*":
 			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 			b = b.lstrip(" *")
+			current_branch = str(b)
 		btnBranch.text = str(b)
 		btnBranch.pressed.connect(func(): switch_branch(b, btnBranch))
 		btnBranch.size = Vector2(200, 45)
@@ -144,8 +169,9 @@ func get_commits():
 		var btnHash := Button.new()
 		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
 		btnHash.text = str(h)
-		var id = h.split(" ")[0]
-		btnHash.pressed.connect(func(): get_logs(id, btnHash))
+		var hash = h.split(" ")[0]
+		current_commit = hash
+		btnHash.pressed.connect(func(): checkout_commit(hash, btnHash))
 		btnHash.size = Vector2(200, 45)
 		btnHash.position = Vector2(5, 5 + i)
 		i += 55
@@ -163,15 +189,24 @@ func clear_commits():
 ## end clear_commits()
 
 
-func get_logs(hash, button):
+func checkout_commit(hash, button):
 	for cb in commit_buttons:
 		if cb != null:
 			cb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	if "HEAD detatched" in txtStatus.text:
+		var reattach := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + current_commit])
+		var pop_stack := OS.execute("powershell.exe", ["cd " + path + "; git stash pop"])
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 	txtCommit.text = ""
 	var results := []
-	var commits := OS.execute("powershell.exe", ["cd " + path + "; git log " + hash], results)
+	#var commits := OS.execute("powershell.exe", ["cd " + path + "; git log " + hash], results)
+	var stage_files := OS.execute("powershell.exe", ["cd " + path + "; git add ."])
+	var push_stack := OS.execute("powershell.exe", ["cd " + path + "; git stash"])
+	var commits := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + hash], results)
 	txtCommit.text = results[0]
+	clear_commits()
+	get_commits()
+	open_log()
 	show_diff(hash)
 	update_status()
 #	var logs = results[0].split("commit")
@@ -179,7 +214,17 @@ func get_logs(hash, button):
 #		l = l.lstrip(" ")
 #		txtCommit.text += l + "\n"
 #		commit_logs.append(l)
-## end get_logs()
+## end checkout_commit()
+
+
+func clear_detatched():
+	var clear_detatched := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + current_branch])
+	clear_commits()
+	get_commits()
+	open_log()
+	show_diff(current_commit)
+	update_status()
+## end clear_detatched()
 
 
 func open_log():

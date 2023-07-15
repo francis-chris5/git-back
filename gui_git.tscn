@@ -67,6 +67,66 @@ custom_minimum_size = Vector2(210, 300)
 layout_mode = 2
 theme_override_constants/separation = 10
 
+[node name="tools" type="HBoxContainer" parent="Panel"]
+layout_mode = 0
+offset_left = 930.0
+offset_top = 90.0
+offset_right = 1078.0
+offset_bottom = 144.0
+theme_override_constants/separation = 15
+
+[node name="commit_tools" type="Button" parent="Panel/tools"]
+layout_mode = 2
+text = "Commit
+Tools"
+
+[node name="branch_tools" type="Button" parent="Panel/tools"]
+layout_mode = 2
+text = "Branch
+Tools"
+
+[node name="checkout_commit_tools" type="VBoxContainer" parent="Panel"]
+visible = false
+custom_minimum_size = Vector2(200, 450)
+layout_mode = 0
+offset_left = 930.0
+offset_top = 150.0
+offset_right = 1130.0
+offset_bottom = 610.0
+theme_override_constants/separation = 10
+
+[node name="revert" type="Button" parent="Panel/checkout_commit_tools"]
+self_modulate = Color(1, 0.282353, 0.282353, 1)
+layout_mode = 2
+text = "Revert Commit"
+
+[node name="reset" type="Button" parent="Panel/checkout_commit_tools"]
+self_modulate = Color(1, 0.282353, 0.282353, 1)
+layout_mode = 2
+text = "Reset Commit"
+
+[node name="clear_detatched" type="Button" parent="Panel/checkout_commit_tools"]
+layout_mode = 2
+text = "Clear Detatched Head"
+
+[node name="save_detatched" type="Button" parent="Panel/checkout_commit_tools"]
+self_modulate = Color(1, 0.282353, 0.282353, 1)
+layout_mode = 2
+text = "Save Detached Head"
+
+[node name="checkout_branch_tools" type="VBoxContainer" parent="Panel"]
+visible = false
+layout_mode = 0
+offset_left = 930.0
+offset_top = 150.0
+offset_right = 970.0
+offset_bottom = 190.0
+
+[node name="rebase" type="Button" parent="Panel/checkout_branch_tools"]
+self_modulate = Color(1, 0.282353, 0.282353, 1)
+layout_mode = 2
+text = "Rebase"
+
 [node name="clone_panel" type="Panel" parent="Panel"]
 visible = false
 custom_minimum_size = Vector2(320, 150)
