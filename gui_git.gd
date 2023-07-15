@@ -35,7 +35,10 @@ var commit_logs = []
 @onready var commit_container = $application/checkout_panel/commits/commit_container
 @onready var branch_container = $application/checkout_panel/branches/branch_container
 
+@onready var new_branch_panel = $application/checkout_panel/new_branch_panel
 @onready var btnClearDetatched = $application/checkout_panel/clear_detatched
+@onready var btnBranchDetatched = $application/checkout_panel/new_branch_panel/branch_detached
+@onready var txtBranchName = $application/checkout_panel/new_branch_panel/branch_name
 
 
 
@@ -55,6 +58,7 @@ func _ready():
 	btnBlameControls.pressed.connect(func(): view_blame_panel())
 	
 	btnClearDetatched.pressed.connect(func(): clear_detatched())
+	btnBranchDetatched.pressed.connect(func(): branch_detatched())
 ## end _ready()
 
 
@@ -239,12 +243,29 @@ func checkout_commit(hash, button):
 
 func clear_detatched():
 	var clear_detatched := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + current_branch])
-	clear_commits()
-	get_commits()
-	open_log()
-	show_diff(current_commit)
-	update_status()
+#	clear_commits()
+#	get_commits()
+#	open_log()
+#	show_diff(current_commit)
+#	update_status()
+	scan_history()
 ## end clear_detatched()
+
+
+func branch_detatched():
+	var branch_name = ""
+	if txtBranchName.text == "":
+		branch_name = current_commit
+	else:
+		branch_name = txtBranchName.text
+	var new_branch := OS.execute("powershell.exe", ["cd " + path + "; git switch -c " + branch_name])
+#	clear_commits()
+#	get_commits()
+#	open_log()
+#	show_diff(current_commit)
+#	update_status()
+	scan_history()
+## end branch_detatched()
 
 
 func open_log():
@@ -259,14 +280,17 @@ func switch_branch(branch_name, button):
 			bb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 	var results := []
-	var current_branch := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + branch_name], results)
-	clear_commits()
-	txtCommit.text = ""
-	txtStatus.text = ""
-	txtDiff.text = ""
-	get_commits()
-	update_status()
-	show_diff()
+	var checkout_branch := OS.execute("powershell.exe", ["cd " + path + "; git checkout " + branch_name], results)
+	if "fatal" not in results[0]:
+		current_branch = branch_name
+#	clear_commits()
+#	txtCommit.text = ""
+#	txtStatus.text = ""
+#	txtDiff.text = ""
+#	get_commits()
+#	update_status()
+#	show_diff()
+	scan_history()
 ## end switch_branch()
 
 
@@ -278,8 +302,10 @@ func update_status():
 	txtStatus.text = results[0]
 	if "HEAD detached" in results[0]:
 		btnClearDetatched.visible = true
+		new_branch_panel.visible = true
 	else:
 		btnClearDetatched.visible = false
+		new_branch_panel.visible = false
 ## end get_txtStatus()
 
 

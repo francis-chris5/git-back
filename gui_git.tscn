@@ -119,16 +119,6 @@ offset_bottom = 540.0
 editable = false
 wrap_mode = 1
 
-[node name="clear_detatched" type="Button" parent="application/checkout_panel"]
-visible = false
-layout_mode = 2
-offset_left = 24.0
-offset_top = 314.0
-offset_right = 224.0
-offset_bottom = 368.0
-text = "Return To 
-Attached"
-
 [node name="diff" type="TextEdit" parent="application/checkout_panel"]
 custom_minimum_size = Vector2(450, 200)
 layout_mode = 0
@@ -163,6 +153,49 @@ offset_bottom = 310.0
 custom_minimum_size = Vector2(210, 300)
 layout_mode = 2
 theme_override_constants/separation = 10
+
+[node name="clear_detatched" type="Button" parent="application/checkout_panel"]
+visible = false
+layout_mode = 2
+offset_left = 24.0
+offset_top = 314.0
+offset_right = 224.0
+offset_bottom = 368.0
+text = "Return To 
+Attached"
+
+[node name="new_branch_panel" type="Panel" parent="application/checkout_panel"]
+visible = false
+layout_mode = 0
+offset_left = 457.0
+offset_top = -28.0
+offset_right = 907.0
+offset_bottom = 52.0
+
+[node name="branch_detached" type="Button" parent="application/checkout_panel/new_branch_panel"]
+layout_mode = 0
+offset_left = 21.0
+offset_top = 9.0
+offset_right = 107.0
+offset_bottom = 63.0
+text = "Break Off
+As Branch
+"
+
+[node name="Label" type="Label" parent="application/checkout_panel/new_branch_panel"]
+layout_mode = 0
+offset_left = 120.0
+offset_top = 22.0
+offset_right = 171.0
+offset_bottom = 48.0
+text = "Name:"
+
+[node name="branch_name" type="TextEdit" parent="application/checkout_panel/new_branch_panel"]
+layout_mode = 0
+offset_left = 180.0
+offset_top = 18.0
+offset_right = 410.0
+offset_bottom = 63.0
 
 [node name="revert_panel" type="Panel" parent="application"]
 visible = false
