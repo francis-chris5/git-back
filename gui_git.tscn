@@ -83,6 +83,14 @@ offset_bottom = 535.0
 layout_mode = 2
 text = "Checkout"
 
+[node name="revert_controls" type="Button" parent="application/control_options"]
+layout_mode = 2
+text = "Revert"
+
+[node name="blame_controls" type="Button" parent="application/control_options"]
+layout_mode = 2
+text = "Blame"
+
 [node name="checkout_panel" type="Panel" parent="application"]
 visible = false
 layout_mode = 0
@@ -155,3 +163,35 @@ offset_bottom = 310.0
 custom_minimum_size = Vector2(210, 300)
 layout_mode = 2
 theme_override_constants/separation = 10
+
+[node name="revert_panel" type="Panel" parent="application"]
+visible = false
+layout_mode = 0
+offset_left = 220.0
+offset_top = 70.0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="temp" type="Label" parent="application/revert_panel"]
+layout_mode = 0
+offset_left = 302.0
+offset_top = 244.0
+offset_right = 541.0
+offset_bottom = 270.0
+text = "Revert Controls Coming Soon..."
+
+[node name="blame_panel" type="Panel" parent="application"]
+visible = false
+layout_mode = 0
+offset_left = 220.0
+offset_top = 70.0
+offset_right = 1152.0
+offset_bottom = 648.0
+
+[node name="Label" type="Label" parent="application/blame_panel"]
+layout_mode = 0
+offset_left = 274.0
+offset_top = 200.0
+offset_right = 508.0
+offset_bottom = 226.0
+text = "Blame features coming soon..."

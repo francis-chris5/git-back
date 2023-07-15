@@ -20,7 +20,12 @@ var commit_logs = []
 
 
 @onready var btnCheckoutControls = $application/control_options/checkout_controls
+@onready var btnRevertControls = $application/control_options/revert_controls
+@onready var btnBlameControls = $application/control_options/blame_controls
+
 @onready var checkout_panel = $application/checkout_panel
+@onready var revert_panel = $application/revert_panel
+@onready var blame_panel = $application/blame_panel
 
 
 @onready var txtCommit = $application/checkout_panel/commit_log
@@ -46,6 +51,8 @@ func _ready():
 	btnCloneLocation.pressed.connect(func(): choose_location())
 	
 	btnCheckoutControls.pressed.connect(func(): view_checkout_panel())
+	btnRevertControls.pressed.connect(func(): view_revert_panel())
+	btnBlameControls.pressed.connect(func(): view_blame_panel())
 	
 	btnClearDetatched.pressed.connect(func(): clear_detatched())
 ## end _ready()
@@ -77,7 +84,22 @@ func toggle_clone_repository():
 
 func view_checkout_panel():
 	checkout_panel.visible = true
-	## set other panels to false here once they exist
+	revert_panel.visible = false
+	blame_panel.visible = false
+## end toggle_checkout_panel()
+
+
+func view_revert_panel():
+	checkout_panel.visible = false
+	revert_panel.visible = true
+	blame_panel.visible = false
+## end toggle_checkout_panel()
+
+
+func view_blame_panel():
+	checkout_panel.visible = false
+	revert_panel.visible = false
+	blame_panel.visible = true
 ## end toggle_checkout_panel()
 
 
