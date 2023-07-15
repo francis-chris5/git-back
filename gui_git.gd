@@ -8,12 +8,22 @@ var commit_buttons = []
 var commit_logs = []
 
 @onready var btnOpen = $Panel/main_menu/open
-@onready var btnScan = $Panel/scan
+@onready var btnClone = $Panel/main_menu/clone
+
+
+@onready var clone_panel = $Panel/clone_panel
+@onready var btnCloneLocation = $Panel/clone_panel/clone_location
+@onready var txtCloneURL = $Panel/clone_panel/clone_url
+
+
 @onready var txtCommit = $Panel/commit_log
 @onready var txtStatus = $Panel/status
 @onready var txtDiff = $Panel/diff
+
+
 @onready var commit_container = $Panel/commits/commit_container
 @onready var branch_container = $Panel/branches/branch_container
+
 
 
 
@@ -22,6 +32,8 @@ func _ready():
 	#get_commits()
 	#get_logs()
 	btnOpen.pressed.connect(func(): open_repository())
+	btnClone.pressed.connect(func(): toggle_clone_repository())
+	btnCloneLocation.pressed.connect(func(): choose_location())
 ## end _ready()
 
 
@@ -43,6 +55,38 @@ func open_repository():
 ## end open_repository()
 
 
+func toggle_clone_repository():
+	clone_panel.visible = not clone_panel.visible
+## end clone_repository()
+
+
+func choose_location():
+	if txtCloneURL.text == "":
+		pass
+	else:
+		var results := []
+		var set_location := OS.execute("powershell.exe", ["python choose_location.py"], results)
+		var locale = ""
+		if results[0] == "invalid\r\n":
+			locale = "C:/"
+		else:
+			locale = results[0].rstrip("\r\n")
+		var clone_repo := OS.execute("powershell.exe", ["cd " + locale + "; git clone " + txtCloneURL.text], results)
+		if "fatal" not in results[0]:
+			var repo_name = ""
+			var repo = txtCloneURL.text.split("/")
+			if ".git" in repo[len(repo)-1]:
+				repo_name = repo[len(repo)-1].get_slice(".", 0)
+			else:
+				repo_name = repo[len(repo)-1]
+			path = locale + "/" + repo_name
+			print(path)
+			scan_history()
+			txtCloneURL.text = ""
+			clone_panel.visible = false
+## end choose_location()
+
+
 func scan_history():
 	clear_branches()
 	clear_commits()
@@ -51,7 +95,7 @@ func scan_history():
 	txtDiff.text = ""
 	get_branches()
 	get_commits()
-	update_txtStatus()
+	update_status()
 	open_log()
 	show_diff()
 ## end scan_history()
@@ -129,6 +173,7 @@ func get_logs(hash, button):
 	var commits := OS.execute("powershell.exe", ["cd " + path + "; git log " + hash], results)
 	txtCommit.text = results[0]
 	show_diff(hash)
+	update_status()
 #	var logs = results[0].split("commit")
 #	for l in logs:
 #		l = l.lstrip(" ")
@@ -155,13 +200,13 @@ func switch_branch(branch_name, button):
 	txtStatus.text = ""
 	txtDiff.text = ""
 	get_commits()
-	update_txtStatus()
+	update_status()
 	show_diff()
 ## end switch_branch()
 
 
 
-func update_txtStatus():
+func update_status():
 	var results := []
 	var current_status := OS.execute("powershell.exe", ["cd " + path + "; git status"], results)
 	txtStatus.text = ""
