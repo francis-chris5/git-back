@@ -5,15 +5,30 @@ Git-Back Version Control Interface Application
 
 Virtual Reality Interface:
 
-	Checkout
-		the branches will be like boxes
-		the commits will be like pieces of paper in the boxes
+	1.)
+		Checkout
+			the branches will be like boxes
+			the commits will be like pieces of paper in the boxes
 
-		grabbing and pulling out a piece of paper checks out that commit
+			grabbing and pulling out a piece of paper checks out that commit
 
-			putting it back in the same box will return from detached head state
+				putting it back in the same box will return from detached head state
 
-			putting it in a new box will create a new branch from that checkout
+				putting it in a new box will create a new branch from that checkout
+
+	2.) 
+		the repository will look like a tree
+		branches that have commits will have leafs/fruit representing the commits
+		tapping a branch will checkout that branch
+		picking a leaf/fruit will checkout that commit
+
+
+	3.) 
+		the repository looks like a clothes line with items hung out to dry
+		branches are different lines things hang on
+		pulling an item off the clothes line checks out the commit it represents (logo on t-shirt or something)
+			put in laundry basket to create a new branch
+			hang back up to return to attached head state
 
 
 
@@ -21,3 +36,13 @@ Virtual Reality Interface:
 Important Notes & Things to Look Into:
 
 	stash is being used internally by software (when checking out a previous commit it immediately adds and stashes all files then pops index 0 from stash upon returning from detached head state --DOES NOT RECOVER THEM IN NEW BRANCH SCENARIO YET--). Could this cause problems with existing stashes in the repository
+
+
+
+
+Bug Reporting:
+
+	hit an issue where the program froze up and crashed everything when switching from checking out one commit to checking out an earlier commit. going to terminal to check found out i couldn't do anything because .git/index.lock file already exists. 
+		* not sure which function created it
+		* found a post on stack overflow -answered own question- where he thoguht it was the result of commands coming in quicker than git could keep up on a slow file system
+		** have not been able to recreate yet

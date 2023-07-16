@@ -222,10 +222,21 @@ offset_top = 70.0
 offset_right = 1152.0
 offset_bottom = 648.0
 
-[node name="Label" type="Label" parent="application/blame_panel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="application/blame_panel"]
 layout_mode = 0
-offset_left = 274.0
-offset_top = 200.0
-offset_right = 508.0
-offset_bottom = 226.0
-text = "Blame features coming soon..."
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 360.0
+offset_bottom = 310.0
+
+[node name="blame_file_container" type="VBoxContainer" parent="application/blame_panel/ScrollContainer"]
+custom_minimum_size = Vector2(350, 300)
+layout_mode = 2
+
+[node name="blame_file_current" type="TextEdit" parent="application/blame_panel"]
+layout_mode = 0
+offset_left = 395.0
+offset_top = 10.0
+offset_right = 870.0
+offset_bottom = 510.0
+editable = false

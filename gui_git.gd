@@ -9,6 +9,8 @@ var current_commit = ""
 var branch_buttons = []
 var commit_buttons = []
 var commit_logs = []
+var file_list = []
+
 
 @onready var btnOpen = $application/main_menu/open
 @onready var btnClone = $application/main_menu/clone
@@ -41,7 +43,8 @@ var commit_logs = []
 @onready var txtBranchName = $application/checkout_panel/new_branch_panel/branch_name
 
 
-
+@onready var blame_file_container = $application/blame_panel/ScrollContainer/blame_file_container
+@onready var txtBlameFile = $application/blame_panel/blame_file_current
 
 
 
@@ -114,6 +117,8 @@ func view_blame_panel():
 	checkout_panel.visible = false
 	revert_panel.visible = false
 	blame_panel.visible = true
+	scan_files()
+	txtBlameFile.text = ""
 ## end toggle_checkout_panel()
 
 
@@ -193,7 +198,6 @@ func get_commits():
 	var results = run_git_command("git log --oneline")
 	var hashes = results[0].split("\n")
 	hashes.remove_at(len(hashes)-1)
-	var i : int = 0
 	for h in hashes:
 		var btnHash := Button.new()
 		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -303,6 +307,29 @@ func show_diff(hash="", branches=[]):
 		txtDiff.text = results[0]
 ## end show_diff()
 
+
+
+func scan_files():
+	var results = run_git_command("git ls-files")
+	var files = results[0].split("\n")
+	files.remove_at(len(files)-1)
+	for f in files:
+		var btnFile := Button.new()
+		btnFile.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
+		btnFile.text = str(f)
+		btnFile.pressed.connect(func(): show_blame(str(f)))
+		file_list.append(btnFile)
+	for fl in file_list:
+		if fl != null:
+			blame_file_container.add_child(fl)
+## end scan_files()
+
+
+
+func show_blame(filepath):
+	var results = run_git_command("git blame " + filepath)
+	txtBlameFile.text = results[0]
+## end show_blame()
 
 
 
