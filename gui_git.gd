@@ -10,6 +10,9 @@ var branch_buttons = []
 var commit_buttons = []
 var commit_logs = []
 var file_list = []
+var revert_list = []
+
+var hash_to_revert = ""
 
 
 @onready var btnOpen = $application/main_menu/open
@@ -43,6 +46,12 @@ var file_list = []
 @onready var txtBranchName = $application/checkout_panel/new_branch_panel/branch_name
 
 
+@onready var revert_commit_container = $application/revert_panel/revert_commits/revert_commit_container
+@onready var txtRevert = $application/revert_panel/revert_text
+@onready var btnRevert = $application/revert_panel/revert_tools/revert_button
+@onready var txtRevertMessage = $application/revert_panel/revert_message
+
+
 @onready var blame_file_container = $application/blame_panel/ScrollContainer/blame_file_container
 @onready var txtBlameFile = $application/blame_panel/blame_file_current
 
@@ -59,6 +68,8 @@ func _ready():
 	
 	btnClearDetatched.pressed.connect(func(): clear_detatched())
 	btnBranchDetatched.pressed.connect(func(): branch_detatched())
+	
+	btnRevert.pressed.connect(func(): revert_commit())
 ## end _ready()
 
 
@@ -110,6 +121,7 @@ func view_revert_panel():
 	checkout_panel.visible = false
 	revert_panel.visible = true
 	blame_panel.visible = false
+	get_revert_commits()
 ## end toggle_checkout_panel()
 
 
@@ -189,12 +201,13 @@ func clear_branches():
 	for bb in branch_buttons:
 		if bb != null:
 			bb.queue_free()
+	branch_buttons = []
 ## end clear_branches()
 
 
 
 func get_commits():
-	## KEEP THIS TO COPY LATER ##var get_hashes := OS.execute("powershell.exe", ["git log --pretty=format:%h"], results)
+	clear_commits()
 	var results = run_git_command("git log --oneline")
 	var hashes = results[0].split("\n")
 	hashes.remove_at(len(hashes)-1)
@@ -217,6 +230,7 @@ func clear_commits():
 	for cb in commit_buttons:
 		if cb != null:
 			cb.queue_free()
+	commit_buttons = []
 ## end clear_commits()
 
 
@@ -234,7 +248,6 @@ func checkout_commit(hash, button):
 	run_git_command("git stash")
 	var results = run_git_command("git checkout " + hash)
 	txtCommit.text = results[0]
-	clear_commits()
 	get_commits()
 	open_log()
 	show_diff(hash)
@@ -342,6 +355,62 @@ func show_blame(filepath):
 ## end show_blame()
 
 
+
+
+func get_revert_commits():
+	txtRevertMessage.text = ""
+	txtRevert.text = ""
+	btnRevert.disabled = true
+	clear_revert()
+	var results = run_git_command("git log --oneline")
+	var hashes = results[0].split("\n")
+	hashes.remove_at(len(hashes)-1)
+	for h in hashes:
+		var btnHash := Button.new()
+		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
+		btnHash.text = str(h)
+		var hash = h.split(" ")[0]
+		current_commit = hash
+		btnHash.pressed.connect(func(): preview_revert(hash, btnHash))
+		revert_list.append(btnHash)
+	for rl in revert_list:
+		if rl != null:
+			revert_commit_container.add_child(rl)
+## end get_commits()
+
+
+
+func clear_revert():
+	for rl in revert_list:
+		if rl != null:
+			rl.queue_free()
+	revert_list = []
+## end clear_revert()
+
+
+
+
+func preview_revert(hash, button):
+	for rl in revert_list:
+		if rl != null:
+			rl.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+	var results = run_git_command("git diff " + hash + "^!")
+	txtRevert.text = results[0]
+	btnRevert.disabled = false
+	hash_to_revert = hash
+## end preview_revert()
+
+
+
+func revert_commit():
+	var results = run_git_command("git revert " + hash_to_revert + " --no-edit")
+	txtRevert.text = ""
+	get_revert_commits()
+	get_commits()
+	txtRevertMessage.text = results[0]
+	btnRevert.disabled = true
+## end revert_commit()
 
 
 

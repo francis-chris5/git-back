@@ -97,8 +97,8 @@ visible = false
 layout_mode = 0
 offset_left = 220.0
 offset_top = 70.0
-offset_right = 1152.0
-offset_bottom = 648.0
+offset_right = 1142.0
+offset_bottom = 618.0
 
 [node name="commit_log" type="TextEdit" parent="application/checkout_panel"]
 custom_minimum_size = Vector2(450, 300)
@@ -203,24 +203,57 @@ visible = false
 layout_mode = 0
 offset_left = 220.0
 offset_top = 70.0
-offset_right = 1152.0
-offset_bottom = 648.0
+offset_right = 1142.0
+offset_bottom = 618.0
 
-[node name="temp" type="Label" parent="application/revert_panel"]
+[node name="revert_commits" type="ScrollContainer" parent="application/revert_panel"]
 layout_mode = 0
-offset_left = 302.0
-offset_top = 244.0
-offset_right = 541.0
-offset_bottom = 270.0
-text = "Revert Controls Coming Soon..."
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 210.0
+offset_bottom = 360.0
+
+[node name="revert_commit_container" type="VBoxContainer" parent="application/revert_panel/revert_commits"]
+custom_minimum_size = Vector2(200, 350)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="revert_tools" type="VBoxContainer" parent="application/revert_panel"]
+layout_mode = 0
+offset_left = 705.0
+offset_top = 10.0
+offset_right = 905.0
+offset_bottom = 185.0
+theme_override_constants/separation = 10
+
+[node name="revert_button" type="Button" parent="application/revert_panel/revert_tools"]
+layout_mode = 2
+disabled = true
+text = "Revert Commit"
+
+[node name="revert_text" type="TextEdit" parent="application/revert_panel"]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 10.0
+offset_right = 695.0
+offset_bottom = 360.0
+editable = false
+
+[node name="revert_message" type="TextEdit" parent="application/revert_panel"]
+layout_mode = 0
+offset_left = 220.0
+offset_top = 370.0
+offset_right = 695.0
+offset_bottom = 520.0
+editable = false
 
 [node name="blame_panel" type="Panel" parent="application"]
 visible = false
 layout_mode = 0
 offset_left = 220.0
 offset_top = 70.0
-offset_right = 1152.0
-offset_bottom = 648.0
+offset_right = 1142.0
+offset_bottom = 618.0
 
 [node name="ScrollContainer" type="ScrollContainer" parent="application/blame_panel"]
 layout_mode = 0
