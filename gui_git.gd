@@ -310,6 +310,7 @@ func show_diff(hash="", branches=[]):
 
 
 func scan_files():
+	clear_files()
 	var results = run_git_command("git ls-files")
 	var files = results[0].split("\n")
 	files.remove_at(len(files)-1)
@@ -323,6 +324,15 @@ func scan_files():
 		if fl != null:
 			blame_file_container.add_child(fl)
 ## end scan_files()
+
+
+
+func clear_files():
+	for fl in file_list:
+		if fl != null:
+			fl.queue_free()
+	file_list = []
+## end clear_files()
 
 
 
