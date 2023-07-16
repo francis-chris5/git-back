@@ -27,10 +27,15 @@ var hash_to_revert = ""
 @onready var btnCheckoutControls = $application/control_options/checkout_controls
 @onready var btnRevertControls = $application/control_options/revert_controls
 @onready var btnBlameControls = $application/control_options/blame_controls
+@onready var btnMergeControls = $application/control_options/merge_controls
+@onready var btnRemoteControls = $application/control_options/remote_controls
+
 
 @onready var checkout_panel = $application/checkout_panel
 @onready var revert_panel = $application/revert_panel
 @onready var blame_panel = $application/blame_panel
+@onready var merge_panel = $application/merge_panel
+@onready var remote_panel = $application/remote_panel
 
 
 @onready var txtCommit = $application/checkout_panel/commit_log
@@ -52,8 +57,15 @@ var hash_to_revert = ""
 @onready var txtRevertMessage = $application/revert_panel/revert_message
 
 
-@onready var blame_file_container = $application/blame_panel/ScrollContainer/blame_file_container
+@onready var blame_file_container = $application/blame_panel/blame_files/blame_file_container
 @onready var txtBlameFile = $application/blame_panel/blame_file_current
+
+@onready var into_container = $application/merge_panel/merge_into/into_container
+@onready var from_container = $application/merge_panel/merge_from/from_container
+@onready var pick_into_container = $application/merge_panel/pick_into/pick_into_container
+@onready var pick_from_container = $application/merge_panel/pick_from/pick_from_container
+@onready var txtMerge = $application/merge_panel/merge_message
+
 
 
 
@@ -65,6 +77,8 @@ func _ready():
 	btnCheckoutControls.pressed.connect(func(): view_checkout_panel())
 	btnRevertControls.pressed.connect(func(): view_revert_panel())
 	btnBlameControls.pressed.connect(func(): view_blame_panel())
+	btnMergeControls.pressed.connect(func(): view_merge_panel())
+	btnRemoteControls.pressed.connect(func(): view_remote_panel())
 	
 	btnClearDetatched.pressed.connect(func(): clear_detatched())
 	btnBranchDetatched.pressed.connect(func(): branch_detatched())
@@ -82,7 +96,7 @@ func run_git_command(command, locale=""):
 	if locale == "":
 		locale = path
 	var results := []
-	var git_command := OS.execute("powershell.exe", ["cd " + locale + "; " + command], results)
+	var git_command := OS.execute(terminal, ["cd " + locale + "; " + command], results)
 	return results
 ## end run_git_command()
 
@@ -114,24 +128,51 @@ func view_checkout_panel():
 	checkout_panel.visible = true
 	revert_panel.visible = false
 	blame_panel.visible = false
-## end toggle_checkout_panel()
+	merge_panel.visible = false
+	remote_panel.visible = false
+## end view_checkout_panel()
 
 
 func view_revert_panel():
 	checkout_panel.visible = false
 	revert_panel.visible = true
 	blame_panel.visible = false
+	merge_panel.visible = false
+	remote_panel.visible = false
 	get_revert_commits()
-## end toggle_checkout_panel()
+## end view_revert_panel()
 
 
 func view_blame_panel():
 	checkout_panel.visible = false
 	revert_panel.visible = false
 	blame_panel.visible = true
+	merge_panel.visible = false
+	remote_panel.visible = false
 	scan_files()
 	txtBlameFile.text = ""
-## end toggle_checkout_panel()
+## end view_blame_panel()
+
+
+
+func view_merge_panel():
+	checkout_panel.visible = false
+	revert_panel.visible = false
+	blame_panel.visible = false
+	merge_panel.visible = true
+	remote_panel.visible = false
+## end view_merge_panel()
+
+
+
+func view_remote_panel():
+	checkout_panel.visible = false
+	revert_panel.visible = false
+	blame_panel.visible = false
+	merge_panel.visible = false
+	remote_panel.visible = true
+## end view_remote_panel()
+
 
 
 func choose_location():

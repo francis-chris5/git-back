@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://egqkcmaef51t"]
+[gd_scene load_steps=3 format=3 uid="uid://egqkcmaef51t"]
 
 [ext_resource type="Script" path="res://gui_git.gd" id="1_p5pk2"]
+[ext_resource type="Texture2D" uid="uid://dvsobogm4ycrx" path="res://arrow.svg" id="2_68b3w"]
 
 [node name="gui-git" type="CanvasLayer"]
 script = ExtResource("1_p5pk2")
@@ -91,6 +92,17 @@ text = "Revert"
 [node name="blame_controls" type="Button" parent="application/control_options"]
 layout_mode = 2
 text = "Blame"
+
+[node name="merge_controls" type="Button" parent="application/control_options"]
+visible = false
+layout_mode = 2
+text = "Merge"
+
+[node name="remote_controls" type="Button" parent="application/control_options"]
+visible = false
+layout_mode = 2
+text = "Remote
+"
 
 [node name="checkout_panel" type="Panel" parent="application"]
 visible = false
@@ -255,14 +267,14 @@ offset_top = 70.0
 offset_right = 1142.0
 offset_bottom = 618.0
 
-[node name="ScrollContainer" type="ScrollContainer" parent="application/blame_panel"]
+[node name="blame_files" type="ScrollContainer" parent="application/blame_panel"]
 layout_mode = 0
 offset_left = 10.0
 offset_top = 10.0
 offset_right = 360.0
 offset_bottom = 310.0
 
-[node name="blame_file_container" type="VBoxContainer" parent="application/blame_panel/ScrollContainer"]
+[node name="blame_file_container" type="VBoxContainer" parent="application/blame_panel/blame_files"]
 custom_minimum_size = Vector2(350, 300)
 layout_mode = 2
 
@@ -273,3 +285,190 @@ offset_top = 10.0
 offset_right = 870.0
 offset_bottom = 510.0
 editable = false
+
+[node name="merge_panel" type="Panel" parent="application"]
+visible = false
+layout_mode = 0
+offset_left = 220.0
+offset_top = 70.0
+offset_right = 1142.0
+offset_bottom = 618.0
+
+[node name="merge_branch_button" type="Button" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 155.0
+offset_top = -18.0
+offset_right = 210.0
+offset_bottom = 8.0
+text = "Branch
+"
+
+[node name="cherry_pick_button" type="Button" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 650.0
+offset_top = -17.0
+offset_right = 738.0
+offset_bottom = 9.0
+text = "Cherry Pick"
+
+[node name="merge_into" type="ScrollContainer" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 160.0
+offset_bottom = 310.0
+
+[node name="into_container" type="VBoxContainer" parent="application/merge_panel/merge_into"]
+custom_minimum_size = Vector2(150, 300)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="merge_from" type="ScrollContainer" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 210.0
+offset_top = 10.0
+offset_right = 360.0
+offset_bottom = 310.0
+
+[node name="from_container" type="VBoxContainer" parent="application/merge_panel/merge_from"]
+custom_minimum_size = Vector2(150, 300)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Arrow" type="Sprite2D" parent="application/merge_panel"]
+position = Vector2(185, 140)
+texture = ExtResource("2_68b3w")
+
+[node name="pick_into" type="ScrollContainer" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 500.0
+offset_top = 10.0
+offset_right = 650.0
+offset_bottom = 310.0
+
+[node name="pick_into_container" type="VBoxContainer" parent="application/merge_panel/pick_into"]
+custom_minimum_size = Vector2(150, 300)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="pick_from" type="ScrollContainer" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 710.0
+offset_top = 10.0
+offset_right = 860.0
+offset_bottom = 310.0
+
+[node name="pick_from_container" type="VBoxContainer" parent="application/merge_panel/pick_from"]
+custom_minimum_size = Vector2(150, 300)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Arrow2" type="Sprite2D" parent="application/merge_panel"]
+position = Vector2(675, 140)
+texture = ExtResource("2_68b3w")
+
+[node name="merge_message" type="TextEdit" parent="application/merge_panel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 330.0
+offset_right = 560.0
+offset_bottom = 530.0
+editable = false
+
+[node name="merge_control_container" type="VBoxContainer" parent="application/merge_panel"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_left = 600.0
+offset_top = 330.0
+offset_right = 800.0
+offset_bottom = 530.0
+
+[node name="pull_request_button" type="Button" parent="application/merge_panel/merge_control_container"]
+layout_mode = 2
+text = "Pull Request"
+
+[node name="confirm_merge_button" type="Button" parent="application/merge_panel/merge_control_container"]
+layout_mode = 2
+disabled = true
+text = "Confirm Merge"
+
+[node name="remote_panel" type="Panel" parent="application"]
+visible = false
+layout_mode = 0
+offset_left = 220.0
+offset_top = 70.0
+offset_right = 1142.0
+offset_bottom = 618.0
+
+[node name="existing_pull" type="ScrollContainer" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 70.0
+offset_right = 210.0
+offset_bottom = 370.0
+
+[node name="existing_pull_container" type="VBoxContainer" parent="application/remote_panel/existing_pull"]
+custom_minimum_size = Vector2(200, 300)
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="pull_latest_button" type="Button" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 380.0
+offset_right = 145.0
+offset_bottom = 420.0
+text = "Pull Latest"
+
+[node name="allow_history_check" type="CheckButton" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 24.0
+offset_top = 422.0
+offset_right = 208.0
+offset_bottom = 453.0
+theme_override_font_sizes/font_size = 10
+text = "Allow Unrelated Histories"
+
+[node name="existing_push" type="ScrollContainer" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 550.0
+offset_top = 120.0
+offset_right = 750.0
+offset_bottom = 370.0
+
+[node name="existing_push_container" type="VBoxContainer" parent="application/remote_panel/existing_push"]
+custom_minimum_size = Vector2(200, 250)
+layout_mode = 2
+
+[node name="Label" type="Label" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 480.0
+offset_top = 70.0
+offset_right = 579.0
+offset_bottom = 96.0
+text = "New Branch:"
+
+[node name="new_branch_name" type="TextEdit" parent="application/remote_panel"]
+custom_minimum_size = Vector2(200, 50)
+layout_mode = 0
+offset_left = 585.0
+offset_top = 64.0
+offset_right = 785.0
+offset_bottom = 114.0
+
+[node name="push_branch_button" type="Button" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 595.0
+offset_top = 380.0
+offset_right = 711.0
+offset_bottom = 411.0
+text = "Push Changes"
+
+[node name="force_check" type="CheckButton" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 595.0
+offset_top = 425.0
+offset_right = 714.0
+offset_bottom = 449.0
+theme_override_font_sizes/font_size = 10
+text = "Force Changes"
