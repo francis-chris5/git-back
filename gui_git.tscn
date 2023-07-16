@@ -347,29 +347,13 @@ text = "Allow Unrelated Histories"
 [node name="existing_push" type="ScrollContainer" parent="application/remote_panel"]
 layout_mode = 0
 offset_left = 550.0
-offset_top = 120.0
+offset_top = 70.0
 offset_right = 750.0
 offset_bottom = 370.0
 
 [node name="existing_push_container" type="VBoxContainer" parent="application/remote_panel/existing_push"]
 custom_minimum_size = Vector2(200, 250)
 layout_mode = 2
-
-[node name="Label" type="Label" parent="application/remote_panel"]
-layout_mode = 0
-offset_left = 480.0
-offset_top = 70.0
-offset_right = 579.0
-offset_bottom = 96.0
-text = "New Branch:"
-
-[node name="new_branch_name" type="TextEdit" parent="application/remote_panel"]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 0
-offset_left = 585.0
-offset_top = 64.0
-offset_right = 785.0
-offset_bottom = 114.0
 
 [node name="push_branch_button" type="Button" parent="application/remote_panel"]
 layout_mode = 0
@@ -387,6 +371,13 @@ offset_right = 714.0
 offset_bottom = 449.0
 theme_override_font_sizes/font_size = 10
 text = "Force Changes"
+
+[node name="remote_message" type="TextEdit" parent="application/remote_panel"]
+layout_mode = 0
+offset_left = 230.0
+offset_top = 70.0
+offset_right = 530.0
+offset_bottom = 445.0
 
 [node name="control_options" type="VBoxContainer" parent="application"]
 layout_mode = 0

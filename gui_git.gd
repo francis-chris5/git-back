@@ -78,6 +78,17 @@ var pick_into = ""
 
 
 
+@onready var existing_pull_container = $application/remote_panel/existing_pull/existing_pull_container
+@onready var existing_push_container = $application/remote_panel/existing_push/existing_push_container
+@onready var btnPullLatest = $application/remote_panel/pull_latest_button
+@onready var chkAllowHistory = $application/remote_panel/allow_history_check
+@onready var txtPushBranchName = $application/remote_panel/new_branch_name
+@onready var btnPush = $application/remote_panel/push_branch_button
+@onready var chkForce = $application/remote_panel/force_check
+@onready var txtRemoteMessage = $application/remote_panel/remote_message
+
+
+
 
 func _ready():
 	btnOpen.pressed.connect(func(): open_repository())
@@ -100,6 +111,9 @@ func _ready():
 	btnPullRequest.pressed.connect(func(): make_pull_request())
 	btnConfirmMerge.pressed.connect(func(): confirm_commit())
 	btnAortMerge.pressed.connect(func(): abort_merge())
+	
+	btnPush.pressed.connect(func(): push_changes())
+	btnPullLatest.pressed.connect(func(): pull_latest())
 ## end _ready()
 
 
@@ -189,6 +203,8 @@ func view_remote_panel():
 	blame_panel.visible = false
 	merge_panel.visible = false
 	remote_panel.visible = true
+	txtRemoteMessage.text = ""
+	get_remote_branches()
 ## end view_remote_panel()
 
 
@@ -230,6 +246,12 @@ func scan_history():
 	update_status()
 	open_log()
 	show_diff()
+	for bb in branch_buttons:
+		if "remotes/" in bb.text:
+			btnRemoteControls.visible = true
+			break
+		else:
+			btnRemoteControls.visible = false
 ## end scan_history()
 
 
@@ -623,6 +645,54 @@ func pick_this_branch(branch_name, button):
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 	pick_into = branch_name
 ## end pick_this_branch()
+
+
+
+func get_remote_branches():
+	clear_branches()
+	var results = run_git_command("git branch -a")
+	var branches = results[0].split("\n")
+	branches.remove_at(len(branches)-1)
+	var i : int = 0
+	for b in branches:
+		b = b.lstrip(" ")
+		var btnBranch = Button.new()
+		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		if b[0] == "*":
+			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+			b = b.lstrip(" *")
+			current_branch = str(b)
+		btnBranch.text = str(b)
+		btnBranch.pressed.connect(func(): switch_branch(b, btnBranch))
+		branch_buttons.append(btnBranch)
+	for bb in branch_buttons:
+		if bb != null:
+			existing_push_container.add_child(bb)
+## end get_remote_branches()
+
+
+
+func push_changes():
+	var results = []
+	if chkForce.button_pressed:
+		results = run_git_command("git push origin " + current_branch + " -f")
+	else:
+		results = run_git_command("git push origin " + current_branch)
+	print(results)
+	txtRemoteMessage.text = "changes probably pushed back\nto " + current_branch + "\nthe gui doesn't want to\nwait for the upload message to finish\n\n" + results[0]
+## end push_changes()
+
+
+
+func pull_latest():
+	var results = []
+	if chkAllowHistory.button_pressed:
+		results = run_git_command("git pull origin " + current_branch + " --allow-unrelated-histories")
+	else:
+		results = run_git_command("git pull origin " + current_branch)
+	print(results)
+	txtRemoteMessage.text = results[0]
+## end pull_latest()
 
 
 
