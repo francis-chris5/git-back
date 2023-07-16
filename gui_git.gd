@@ -14,6 +14,11 @@ var revert_list = []
 
 var hash_to_revert = ""
 
+enum merge {BRANCH, CHERRY_PICK}
+var merge_branch = ""
+var pick_from = ""
+var pick_into = ""
+
 
 @onready var btnOpen = $application/main_menu/open
 @onready var btnClone = $application/main_menu/clone
@@ -65,6 +70,11 @@ var hash_to_revert = ""
 @onready var pick_into_container = $application/merge_panel/pick_into/pick_into_container
 @onready var pick_from_container = $application/merge_panel/pick_from/pick_from_container
 @onready var txtMerge = $application/merge_panel/merge_message
+@onready var btnMerge = $application/merge_panel/merge_branch_button
+@onready var btnCherryPick = $application/merge_panel/cherry_pick_button
+@onready var btnPullRequest = $application/merge_panel/merge_control_container/pull_request_button
+@onready var btnConfirmMerge = $application/merge_panel/merge_control_container/confirm_merge_button
+@onready var btnAortMerge = $application/merge_panel/merge_control_container/abort_merge
 
 
 
@@ -84,6 +94,12 @@ func _ready():
 	btnBranchDetatched.pressed.connect(func(): branch_detatched())
 	
 	btnRevert.pressed.connect(func(): revert_commit())
+	
+	btnMerge.pressed.connect(func(): branch_merging())
+	btnCherryPick.pressed.connect(func(): cherry_pick_merging())
+	btnPullRequest.pressed.connect(func(): make_pull_request())
+	btnConfirmMerge.pressed.connect(func(): confirm_commit())
+	btnAortMerge.pressed.connect(func(): abort_merge())
 ## end _ready()
 
 
@@ -130,6 +146,7 @@ func view_checkout_panel():
 	blame_panel.visible = false
 	merge_panel.visible = false
 	remote_panel.visible = false
+	scan_history()
 ## end view_checkout_panel()
 
 
@@ -161,6 +178,7 @@ func view_merge_panel():
 	blame_panel.visible = false
 	merge_panel.visible = true
 	remote_panel.visible = false
+	reset_merge()
 ## end view_merge_panel()
 
 
@@ -216,6 +234,7 @@ func scan_history():
 
 
 func get_branches():
+	clear_branches()
 	var results = run_git_command("git branch -a")
 	var branches = results[0].split("\n")
 	branches.remove_at(len(branches)-1)
@@ -281,7 +300,7 @@ func checkout_commit(hash, button):
 		if cb != null:
 			cb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 	if "HEAD detached" in txtStatus.text:
-		run_git_command("git checkout " + current_commit)
+		run_git_command("git checkout " + current_branch)
 		run_git_command("git stash pop")
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 	txtCommit.text = ""
@@ -293,6 +312,7 @@ func checkout_commit(hash, button):
 	open_log()
 	show_diff(hash)
 	update_status()
+	current_commit = hash
 ## end checkout_commit()
 
 
@@ -307,9 +327,10 @@ func clear_detatched():
 func branch_detatched():
 	var branch_name = ""
 	if txtBranchName.text == "":
-		branch_name = current_commit
+		branch_name = "from_" + current_commit
 	else:
 		branch_name = txtBranchName.text
+	print(branch_name)
 	run_git_command("git switch -c " + branch_name)
 	scan_history()
 ## end branch_detatched()
@@ -452,6 +473,167 @@ func revert_commit():
 	txtRevertMessage.text = results[0]
 	btnRevert.disabled = true
 ## end revert_commit()
+
+
+
+func branch_merging():
+	reset_merge()
+	get_merge_branches(merge.BRANCH)
+## end branch_merging()
+
+
+
+func cherry_pick_merging():
+	reset_merge()
+	get_merge_branches(merge.CHERRY_PICK)
+	get_pick_from_commits()
+## end cherry_pick_merging()
+
+
+
+func reset_merge():
+	clear_branches()
+	clear_commits()
+	txtMerge.text = ""
+	btnConfirmMerge.disabled = true
+## end reset_merge()
+
+
+
+func get_merge_branches(merge_type):
+	clear_branches()
+	var results = run_git_command("git branch -a")
+	var branches = results[0].split("\n")
+	branches.remove_at(len(branches)-1)
+	var i : int = 0
+	for b in branches:
+		b = b.lstrip(" ")
+		var btnBranch = Button.new()
+		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		if b[0] == "*":
+			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+			b = b.lstrip(" *")
+			current_branch = str(b)
+			btnBranch.text = str(b)
+			if merge_type == merge.BRANCH:
+				btnBranch.pressed.connect(func(): merge_this_branch(b, btnBranch))
+			elif merge_type == merge.CHERRY_PICK:
+				btnBranch.pressed.connect(func(): pick_this_branch(b, btnBranch))
+			branch_buttons.append(btnBranch)
+		else:
+			btnBranch.text = str(b)
+			if merge_type == merge.BRANCH:
+				btnBranch.pressed.connect(func(): merge_this_branch(b, btnBranch))
+			elif merge_type == merge.CHERRY_PICK:
+				btnBranch.pressed.connect(func(): pick_this_branch(b, btnBranch))
+			branch_buttons.append(btnBranch)
+	if merge_type == merge.BRANCH:
+		for bb in branch_buttons:
+			if bb != null:
+				if bb.text == current_branch:
+					into_container.add_child(bb)
+				else:
+					from_container.add_child(bb)
+	elif merge_type == merge.CHERRY_PICK:
+		for bb in branch_buttons:
+			if bb != null:
+				pick_into_container.add_child(bb)
+## end get_merge_branches()
+
+
+
+func merge_this_branch(branch_name, button):
+	for bb in branch_buttons:
+		if bb != null:
+			bb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+	merge_branch = branch_name
+	btnPullRequest.disabled = false
+## end merge_this_branch()
+
+
+
+func get_pick_from_commits():
+	clear_commits()
+	var results = run_git_command("git log --oneline")
+	var hashes = results[0].split("\n")
+	hashes.remove_at(len(hashes)-1)
+	for h in hashes:
+		var btnHash := Button.new()
+		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
+		btnHash.text = str(h)
+		var hash = h.split(" ")[0]
+		current_commit = hash
+		btnHash.pressed.connect(func(): cherry_picking(hash, btnHash))
+		commit_buttons.append(btnHash)
+	for cb in commit_buttons:
+		if cb != null:
+			pick_from_container.add_child(cb)
+## end get_pick_from_commits()
+
+
+
+func make_pull_request():
+	if current_branch != "" and merge_branch != "":
+		var results = run_git_command("git merge " + current_branch + " " + merge_branch + " --no-commit --no-ff")
+		if "CONFLICT" not in results[0]:
+			btnConfirmMerge.disabled = false
+			btnAortMerge.disabled = false
+			txtMerge.text += "the preview checks out, please confirm to complete the merge"
+		else:
+			txtMerge.text += "There appears to be conflicts, please resolve conflicts and try again\n"
+			txtMerge.text += results[0]
+	elif pick_from != "" and pick_into != "":
+		run_git_command("git checkout " + pick_into)
+		var results = run_git_command("git cherry-pick " + pick_from)
+		txtMerge.text = results[0]
+## end make_pull_request()
+
+
+
+func confirm_commit():
+	var results = run_git_command("git commit --no-edit")
+	txtMerge.text = results[0]
+## end confirm_commit()
+
+
+
+func abort_merge():
+	var results = run_git_command("git merge --abort")
+	txtMerge.text = "Aborted merge"
+## end abort_merge()
+
+
+
+func cherry_picking(hash, button):
+	for cb in commit_buttons:
+		if cb != null:
+			cb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+	pick_from = hash
+	btnPullRequest.disabled = false
+## end cherry_picking()
+
+
+
+func pick_this_branch(branch_name, button):
+	for bb in branch_buttons:
+		if bb != null:
+			bb.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+	pick_into = branch_name
+## end pick_this_branch()
+
+
+
+
+
+
+
+
+
+
+
 
 
 

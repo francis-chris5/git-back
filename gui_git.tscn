@@ -13,97 +13,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="clone_panel" type="Panel" parent="application"]
-visible = false
-custom_minimum_size = Vector2(320, 150)
-layout_mode = 0
-offset_left = 206.0
-offset_top = 32.0
-offset_right = 526.0
-offset_bottom = 182.0
-
-[node name="Label" type="Label" parent="application/clone_panel"]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 31.0
-offset_right = 60.0
-offset_bottom = 54.0
-text = "From: "
-
-[node name="Label2" type="Label" parent="application/clone_panel"]
-layout_mode = 0
-offset_left = 25.0
-offset_top = 87.0
-offset_right = 65.0
-offset_bottom = 113.0
-text = "To: "
-
-[node name="clone_url" type="TextEdit" parent="application/clone_panel"]
-custom_minimum_size = Vector2(230, 45)
-layout_mode = 0
-offset_left = 69.0
-offset_top = 25.0
-offset_right = 269.0
-offset_bottom = 60.0
-
-[node name="clone_location" type="Button" parent="application/clone_panel"]
-custom_minimum_size = Vector2(200, 26)
-layout_mode = 0
-offset_left = 83.0
-offset_top = 84.0
-offset_right = 283.0
-offset_bottom = 115.0
-text = "Choose"
-
-[node name="main_menu" type="HBoxContainer" parent="application"]
-custom_minimum_size = Vector2(800, 40)
-layout_mode = 0
-offset_left = 15.0
-offset_top = 15.0
-offset_right = 815.0
-offset_bottom = 55.0
-theme_override_constants/separation = 10
-
-[node name="open" type="Button" parent="application/main_menu"]
-layout_mode = 2
-text = "Open Repository"
-
-[node name="clone" type="Button" parent="application/main_menu"]
-layout_mode = 2
-text = "Clone Repository
-"
-
-[node name="control_options" type="VBoxContainer" parent="application"]
-layout_mode = 0
-offset_left = 10.0
-offset_top = 85.0
-offset_right = 210.0
-offset_bottom = 535.0
-theme_override_constants/separation = 10
-
-[node name="checkout_controls" type="Button" parent="application/control_options"]
-layout_mode = 2
-text = "Checkout"
-
-[node name="revert_controls" type="Button" parent="application/control_options"]
-layout_mode = 2
-text = "Revert"
-
-[node name="blame_controls" type="Button" parent="application/control_options"]
-layout_mode = 2
-text = "Blame"
-
-[node name="merge_controls" type="Button" parent="application/control_options"]
-visible = false
-layout_mode = 2
-text = "Merge"
-
-[node name="remote_controls" type="Button" parent="application/control_options"]
-visible = false
-layout_mode = 2
-text = "Remote
-"
-
 [node name="checkout_panel" type="Panel" parent="application"]
 visible = false
 layout_mode = 0
@@ -314,12 +223,12 @@ text = "Cherry Pick"
 [node name="merge_into" type="ScrollContainer" parent="application/merge_panel"]
 layout_mode = 0
 offset_left = 10.0
-offset_top = 10.0
+offset_top = 115.0
 offset_right = 160.0
-offset_bottom = 310.0
+offset_bottom = 165.0
 
 [node name="into_container" type="VBoxContainer" parent="application/merge_panel/merge_into"]
-custom_minimum_size = Vector2(150, 300)
+custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
 theme_override_constants/separation = 10
 
@@ -385,12 +294,18 @@ offset_bottom = 530.0
 
 [node name="pull_request_button" type="Button" parent="application/merge_panel/merge_control_container"]
 layout_mode = 2
+disabled = true
 text = "Pull Request"
 
 [node name="confirm_merge_button" type="Button" parent="application/merge_panel/merge_control_container"]
 layout_mode = 2
 disabled = true
 text = "Confirm Merge"
+
+[node name="abort_merge" type="Button" parent="application/merge_panel/merge_control_container"]
+layout_mode = 2
+disabled = true
+text = "Abort Merge"
 
 [node name="remote_panel" type="Panel" parent="application"]
 visible = false
@@ -472,3 +387,93 @@ offset_right = 714.0
 offset_bottom = 449.0
 theme_override_font_sizes/font_size = 10
 text = "Force Changes"
+
+[node name="control_options" type="VBoxContainer" parent="application"]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 85.0
+offset_right = 210.0
+offset_bottom = 535.0
+theme_override_constants/separation = 10
+
+[node name="checkout_controls" type="Button" parent="application/control_options"]
+layout_mode = 2
+text = "Checkout"
+
+[node name="revert_controls" type="Button" parent="application/control_options"]
+layout_mode = 2
+text = "Revert"
+
+[node name="blame_controls" type="Button" parent="application/control_options"]
+layout_mode = 2
+text = "Blame"
+
+[node name="merge_controls" type="Button" parent="application/control_options"]
+layout_mode = 2
+text = "Merge"
+
+[node name="remote_controls" type="Button" parent="application/control_options"]
+visible = false
+layout_mode = 2
+text = "Remote
+"
+
+[node name="main_menu" type="HBoxContainer" parent="application"]
+custom_minimum_size = Vector2(800, 40)
+layout_mode = 0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 815.0
+offset_bottom = 55.0
+theme_override_constants/separation = 10
+
+[node name="open" type="Button" parent="application/main_menu"]
+layout_mode = 2
+text = "Open Repository"
+
+[node name="clone" type="Button" parent="application/main_menu"]
+layout_mode = 2
+text = "Clone Repository
+"
+
+[node name="clone_panel" type="Panel" parent="application"]
+visible = false
+custom_minimum_size = Vector2(320, 150)
+layout_mode = 0
+offset_left = 206.0
+offset_top = 32.0
+offset_right = 526.0
+offset_bottom = 182.0
+
+[node name="Label" type="Label" parent="application/clone_panel"]
+layout_mode = 0
+offset_left = 20.0
+offset_top = 31.0
+offset_right = 60.0
+offset_bottom = 54.0
+text = "From: "
+
+[node name="Label2" type="Label" parent="application/clone_panel"]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 87.0
+offset_right = 65.0
+offset_bottom = 113.0
+text = "To: "
+
+[node name="clone_url" type="TextEdit" parent="application/clone_panel"]
+custom_minimum_size = Vector2(230, 45)
+layout_mode = 0
+offset_left = 69.0
+offset_top = 25.0
+offset_right = 269.0
+offset_bottom = 60.0
+
+[node name="clone_location" type="Button" parent="application/clone_panel"]
+custom_minimum_size = Vector2(200, 26)
+layout_mode = 0
+offset_left = 83.0
+offset_top = 84.0
+offset_right = 283.0
+offset_bottom = 115.0
+text = "Choose"
