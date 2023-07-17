@@ -11,6 +11,8 @@ var commit_buttons = []
 var commit_logs = []
 var file_list = []
 var revert_list = []
+var push_buttons = []
+var pull_buttons = []
 
 var hash_to_revert = ""
 
@@ -18,6 +20,8 @@ enum merge {BRANCH, CHERRY_PICK}
 var merge_branch = ""
 var pick_from = ""
 var pick_into = ""
+
+enum remote {PUSH, PULL}
 
 
 @onready var btnOpen = $application/main_menu/open
@@ -204,7 +208,9 @@ func view_remote_panel():
 	merge_panel.visible = false
 	remote_panel.visible = true
 	txtRemoteMessage.text = ""
-	get_remote_branches()
+	clear_remote_containers()
+	get_remote_branches(remote.PUSH)
+	get_remote_branches(remote.PULL)
 ## end view_remote_panel()
 
 
@@ -270,7 +276,13 @@ func get_branches():
 			b = b.lstrip(" *")
 			current_branch = str(b)
 		btnBranch.text = str(b)
-		btnBranch.pressed.connect(func(): switch_branch(b, btnBranch))
+		btnBranch.tooltip_text = str(b)
+		if "remotes/" not in b:
+			btnBranch.pressed.connect(func(): switch_branch(b, btnBranch))
+		else:
+			var branch = b.get_slice("/", b.get_slice_count("/")-1)
+			btnBranch.pressed.connect(func(): switch_branch(branch, btnBranch))
+			btnBranch.self_modulate = Color(0.35, 0.39, 0.80, 0.9)
 		branch_buttons.append(btnBranch)
 	for bb in branch_buttons:
 		if bb != null:
@@ -297,6 +309,7 @@ func get_commits():
 		var btnHash := Button.new()
 		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
 		btnHash.text = str(h)
+		btnHash.tooltip_text = str(h)
 		var hash = h.split(" ")[0]
 		current_commit = hash
 		btnHash.pressed.connect(func(): checkout_commit(hash, btnHash))
@@ -352,9 +365,9 @@ func branch_detatched():
 		branch_name = "from_" + current_commit
 	else:
 		branch_name = txtBranchName.text
-	print(branch_name)
 	run_git_command("git switch -c " + branch_name)
 	scan_history()
+	txtBranchName.text = ""
 ## end branch_detatched()
 
 
@@ -415,7 +428,8 @@ func scan_files():
 		var btnFile := Button.new()
 		btnFile.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
 		btnFile.text = str(f)
-		btnFile.pressed.connect(func(): show_blame(str(f)))
+		btnFile.tooltip_text = str(f)
+		btnFile.pressed.connect(func(): show_blame(str(f), btnFile))
 		file_list.append(btnFile)
 	for fl in file_list:
 		if fl != null:
@@ -433,7 +447,11 @@ func clear_files():
 
 
 
-func show_blame(filepath):
+func show_blame(filepath, button):
+	for fl in file_list:
+		if fl != null:
+			fl.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 	var results = run_git_command("git blame " + filepath)
 	txtBlameFile.text = results[0]
 ## end show_blame()
@@ -453,6 +471,7 @@ func get_revert_commits():
 		var btnHash := Button.new()
 		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
 		btnHash.text = str(h)
+		btnHash.tooltip_text = str(h)
 		var hash = h.split(" ")[0]
 		current_commit = hash
 		btnHash.pressed.connect(func(): preview_revert(hash, btnHash))
@@ -499,6 +518,7 @@ func revert_commit():
 
 
 func branch_merging():
+	btnPullRequest.disabled = true
 	reset_merge()
 	get_merge_branches(merge.BRANCH)
 ## end branch_merging()
@@ -506,6 +526,7 @@ func branch_merging():
 
 
 func cherry_pick_merging():
+	btnPullRequest.disabled = true
 	reset_merge()
 	get_merge_branches(merge.CHERRY_PICK)
 	get_pick_from_commits()
@@ -537,6 +558,7 @@ func get_merge_branches(merge_type):
 			b = b.lstrip(" *")
 			current_branch = str(b)
 			btnBranch.text = str(b)
+			btnBranch.tooltip_text = str(b)
 			if merge_type == merge.BRANCH:
 				btnBranch.pressed.connect(func(): merge_this_branch(b, btnBranch))
 			elif merge_type == merge.CHERRY_PICK:
@@ -544,6 +566,7 @@ func get_merge_branches(merge_type):
 			branch_buttons.append(btnBranch)
 		else:
 			btnBranch.text = str(b)
+			btnBranch.tooltip_text = str(b)
 			if merge_type == merge.BRANCH:
 				btnBranch.pressed.connect(func(): merge_this_branch(b, btnBranch))
 			elif merge_type == merge.CHERRY_PICK:
@@ -584,6 +607,7 @@ func get_pick_from_commits():
 		var btnHash := Button.new()
 		btnHash.text_overrun_behavior =TextServer.OVERRUN_TRIM_ELLIPSIS
 		btnHash.text = str(h)
+		btnHash.tooltip_text = str(h)
 		var hash = h.split(" ")[0]
 		current_commit = hash
 		btnHash.pressed.connect(func(): cherry_picking(hash, btnHash))
@@ -648,27 +672,68 @@ func pick_this_branch(branch_name, button):
 
 
 
-func get_remote_branches():
+func get_remote_branches(remote_type):
 	clear_branches()
 	var results = run_git_command("git branch -a")
 	var branches = results[0].split("\n")
 	branches.remove_at(len(branches)-1)
 	var i : int = 0
 	for b in branches:
-		b = b.lstrip(" ")
-		var btnBranch = Button.new()
-		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		if b[0] == "*":
-			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
-			b = b.lstrip(" *")
-			current_branch = str(b)
-		btnBranch.text = str(b)
-		btnBranch.pressed.connect(func(): switch_branch(b, btnBranch))
-		branch_buttons.append(btnBranch)
-	for bb in branch_buttons:
-		if bb != null:
-			existing_push_container.add_child(bb)
+		if remote_type == remote.PUSH:
+			b = b.lstrip(" ")
+			var btnBranch = Button.new()
+			btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			if b[0] == "*":
+				btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+				b = b.lstrip(" *")
+				current_branch = str(b)
+				btnBranch.tooltip_text = "Please checkout the branch to push to"
+				btnBranch.text = str(b)
+				push_buttons.append(btnBranch)
+		elif remote_type == remote.PULL:
+			b = b.lstrip(" ")
+			var btnBranch = Button.new()
+			btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			if b[0] == "*":
+				btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
+				b = b.lstrip(" *")
+				current_branch = str(b)
+				btnBranch.pressed.connect(func(): choose_pull_branch(b, btnBranch))
+			if "remotes/" not in b:
+				btnBranch.pressed.connect(func(): choose_pull_branch(b, btnBranch))
+			else:
+				var branch = b.get_slice("/", b.get_slice_count("/")-1)
+				btnBranch.pressed.connect(func(): choose_pull_branch(branch, btnBranch))
+				btnBranch.self_modulate = Color(0.35, 0.39, 0.80, 0.9)
+			btnBranch.text = str(b)
+			pull_buttons.append(btnBranch)
+	for pb in push_buttons:
+		if pb != null:
+			existing_push_container.add_child(pb)
+	for pl in pull_buttons:
+		if pl != null:
+			existing_pull_container.add_child(pl)
 ## end get_remote_branches()
+
+
+
+func choose_pull_branch(branch_name, button):
+	run_git_command("git checkout " + branch_name)
+	clear_remote_containers()
+	get_remote_branches(remote.PUSH)
+	get_remote_branches(remote.PULL)
+## end choose_pull_branch()
+
+
+
+func clear_remote_containers():
+	for pb in push_buttons:
+		if pb != null:
+			pb.queue_free()
+	for pl in pull_buttons:
+		if pl != null:
+			pl.queue_free()
+## end clear_remote_containers()
 
 
 
