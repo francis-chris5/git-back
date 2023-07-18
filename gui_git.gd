@@ -1,6 +1,6 @@
 extends CanvasLayer
 
-var path := "."
+var path := ""
 var terminal = "powershell.exe"
 
 var current_branch = ""
@@ -26,6 +26,7 @@ enum remote {PUSH, PULL}
 
 @onready var btnOpen = $application/main_menu/open
 @onready var btnClone = $application/main_menu/clone
+@onready var btnHelp = $application/main_menu/help
 
 
 @onready var clone_panel = $application/clone_panel
@@ -45,6 +46,14 @@ enum remote {PUSH, PULL}
 @onready var blame_panel = $application/blame_panel
 @onready var merge_panel = $application/merge_panel
 @onready var remote_panel = $application/remote_panel
+@onready var help_panel = $application/help_panel
+
+@onready var txtManual = $application/help_panel/user_manual
+
+
+@onready var dialog_panel = $application/dialog_panel
+@onready var txtMessage = $application/dialog_panel/message_text
+@onready var btnCloseMessage = $application/dialog_panel/close_message
 
 
 @onready var txtCommit = $application/checkout_panel/commit_log
@@ -78,7 +87,7 @@ enum remote {PUSH, PULL}
 @onready var btnCherryPick = $application/merge_panel/cherry_pick_button
 @onready var btnPullRequest = $application/merge_panel/merge_control_container/pull_request_button
 @onready var btnConfirmMerge = $application/merge_panel/merge_control_container/confirm_merge_button
-@onready var btnAortMerge = $application/merge_panel/merge_control_container/abort_merge
+@onready var btnAbortMerge = $application/merge_panel/merge_control_container/abort_merge
 
 
 
@@ -98,6 +107,8 @@ func _ready():
 	btnOpen.pressed.connect(func(): open_repository())
 	btnClone.pressed.connect(func(): toggle_clone_repository())
 	btnCloneLocation.pressed.connect(func(): choose_location())
+	btnHelp.pressed.connect(func(): toggle_help_panel())
+	btnCloseMessage.pressed.connect(func(): close_message_panel())
 	
 	btnCheckoutControls.pressed.connect(func(): view_checkout_panel())
 	btnRevertControls.pressed.connect(func(): view_revert_panel())
@@ -114,7 +125,7 @@ func _ready():
 	btnCherryPick.pressed.connect(func(): cherry_pick_merging())
 	btnPullRequest.pressed.connect(func(): make_pull_request())
 	btnConfirmMerge.pressed.connect(func(): confirm_commit())
-	btnAortMerge.pressed.connect(func(): abort_merge())
+	btnAbortMerge.pressed.connect(func(): abort_merge())
 	
 	btnPush.pressed.connect(func(): push_changes())
 	btnPullLatest.pressed.connect(func(): pull_latest())
@@ -145,11 +156,14 @@ func run_other_command(command):
 func open_repository():
 	var results = run_other_command("python open_repository.py")
 	if results[0] == "not a repository\r\n":
-		path = "."
+		path = ""
+		dialog_panel.visible = true
+		txtMessage.text = "Error, the chosen directory does not appear to be a Git repository"
+		txtMessage.self_modulate = Color(0.78, 0.22, 0.32, 0.9)
 	else:
 		path = results[0]
-	view_checkout_panel()
-	scan_history()
+		view_checkout_panel()
+		scan_history()
 ## end open_repository()
 
 
@@ -158,7 +172,33 @@ func toggle_clone_repository():
 ## end clone_repository()
 
 
+
+func toggle_help_panel():
+	help_panel.visible = not help_panel.visible
+	checkout_panel.visible = false
+	revert_panel.visible = false
+	blame_panel.visible = false
+	merge_panel.visible = false
+	remote_panel.visible = false
+	if help_panel.visible:
+		var manual = FileAccess.get_file_as_string("./user-manual.txt")
+		txtManual.text = manual
+	else:
+		txtManual.text = ""
+## end view_help_panel()
+
+
+
+func close_message_panel():
+	txtMessage.text = ""
+	txtMessage.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
+	dialog_panel.visible = false
+## end close_message_panel()
+
+
+
 func view_checkout_panel():
+	help_panel.visible = false
 	checkout_panel.visible = true
 	revert_panel.visible = false
 	blame_panel.visible = false
@@ -169,6 +209,7 @@ func view_checkout_panel():
 
 
 func view_revert_panel():
+	help_panel.visible = false
 	checkout_panel.visible = false
 	revert_panel.visible = true
 	blame_panel.visible = false
@@ -179,6 +220,7 @@ func view_revert_panel():
 
 
 func view_blame_panel():
+	help_panel.visible = false
 	checkout_panel.visible = false
 	revert_panel.visible = false
 	blame_panel.visible = true
@@ -191,6 +233,7 @@ func view_blame_panel():
 
 
 func view_merge_panel():
+	help_panel.visible = false
 	checkout_panel.visible = false
 	revert_panel.visible = false
 	blame_panel.visible = false
@@ -202,6 +245,7 @@ func view_merge_panel():
 
 
 func view_remote_panel():
+	help_panel.visible = false
 	checkout_panel.visible = false
 	revert_panel.visible = false
 	blame_panel.visible = false
@@ -526,10 +570,12 @@ func branch_merging():
 
 
 func cherry_pick_merging():
-	btnPullRequest.disabled = true
 	reset_merge()
 	get_merge_branches(merge.CHERRY_PICK)
 	get_pick_from_commits()
+	btnPullRequest.disabled = true
+	btnConfirmMerge.disabled = true
+	btnAbortMerge.disabled = true
 ## end cherry_pick_merging()
 
 
@@ -538,7 +584,9 @@ func reset_merge():
 	clear_branches()
 	clear_commits()
 	txtMerge.text = ""
+	btnPullRequest.disabled = true
 	btnConfirmMerge.disabled = true
+	btnAbortMerge.disabled = true
 ## end reset_merge()
 
 
@@ -561,17 +609,16 @@ func get_merge_branches(merge_type):
 			btnBranch.tooltip_text = str(b)
 			if merge_type == merge.BRANCH:
 				btnBranch.pressed.connect(func(): merge_this_branch(b, btnBranch))
-			elif merge_type == merge.CHERRY_PICK:
-				btnBranch.pressed.connect(func(): pick_this_branch(b, btnBranch))
-			branch_buttons.append(btnBranch)
+				branch_buttons.append(btnBranch)
 		else:
 			btnBranch.text = str(b)
 			btnBranch.tooltip_text = str(b)
-			if merge_type == merge.BRANCH:
+			if merge_type == merge.BRANCH and "remotes/" not in b:
 				btnBranch.pressed.connect(func(): merge_this_branch(b, btnBranch))
-			elif merge_type == merge.CHERRY_PICK:
+				branch_buttons.append(btnBranch)
+			elif merge_type == merge.CHERRY_PICK and "remotes/" not in b:
 				btnBranch.pressed.connect(func(): pick_this_branch(b, btnBranch))
-			branch_buttons.append(btnBranch)
+				branch_buttons.append(btnBranch)
 	if merge_type == merge.BRANCH:
 		for bb in branch_buttons:
 			if bb != null:
@@ -624,7 +671,7 @@ func make_pull_request():
 		var results = run_git_command("git merge " + current_branch + " " + merge_branch + " --no-commit --no-ff")
 		if "CONFLICT" not in results[0]:
 			btnConfirmMerge.disabled = false
-			btnAortMerge.disabled = false
+			btnAbortMerge.disabled = false
 			txtMerge.text += "the preview checks out, please confirm to complete the merge"
 		else:
 			txtMerge.text += "There appears to be conflicts, please resolve conflicts and try again\n"
@@ -719,6 +766,7 @@ func get_remote_branches(remote_type):
 
 func choose_pull_branch(branch_name, button):
 	run_git_command("git checkout " + branch_name)
+	current_branch = branch_name
 	clear_remote_containers()
 	get_remote_branches(remote.PUSH)
 	get_remote_branches(remote.PULL)
