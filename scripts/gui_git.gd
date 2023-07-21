@@ -154,7 +154,7 @@ func run_other_command(command):
 
 
 func open_repository():
-	var results = run_other_command("python open_repository.py")
+	var results = run_other_command("python ./scripts/open_repository.py")
 	if results[0] == "not a repository\r\n":
 		path = ""
 		dialog_panel.visible = true
@@ -181,7 +181,7 @@ func toggle_help_panel():
 	merge_panel.visible = false
 	remote_panel.visible = false
 	if help_panel.visible:
-		var manual = FileAccess.get_file_as_string("./user-manual.txt")
+		var manual = FileAccess.get_file_as_string("./assets/user-manual.txt")
 		txtManual.text = manual
 	else:
 		txtManual.text = ""
@@ -254,7 +254,7 @@ func choose_location():
 	if txtCloneURL.text == "":
 		pass
 	else:
-		var results = run_other_command("python choose_location.py")
+		var results = run_other_command("python ./scripts/choose_location.py")
 		var locale = ""
 		if results[0] == "invalid\r\n":
 			locale = "C:/"
