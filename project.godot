@@ -10,9 +10,12 @@ config_version=5
 
 [application]
 
-config/name="git-back"
+config/name="Git-Back"
+config/description="Graphical User Interface for version management in projects using Git-SCM for version control"
 config/features=PackedStringArray("4.0", "Forward Plus")
-config/icon="res://icon.svg"
+boot_splash/image="res://logo.png"
+config/icon="res://logo.svg"
+config/windows_native_icon="res://logo.ico"
 
 [editor]
 

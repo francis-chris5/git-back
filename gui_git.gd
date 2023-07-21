@@ -197,35 +197,34 @@ func close_message_panel():
 
 
 
-func view_checkout_panel():
+func wipe_panels():
 	help_panel.visible = false
-	checkout_panel.visible = true
+	checkout_panel.visible = false
 	revert_panel.visible = false
 	blame_panel.visible = false
 	merge_panel.visible = false
 	remote_panel.visible = false
+## end wipe_panels()
+
+
+
+func view_checkout_panel():
+	wipe_panels()
+	checkout_panel.visible = true
 	scan_history()
 ## end view_checkout_panel()
 
 
 func view_revert_panel():
-	help_panel.visible = false
-	checkout_panel.visible = false
+	wipe_panels()
 	revert_panel.visible = true
-	blame_panel.visible = false
-	merge_panel.visible = false
-	remote_panel.visible = false
 	get_revert_commits()
 ## end view_revert_panel()
 
 
 func view_blame_panel():
-	help_panel.visible = false
-	checkout_panel.visible = false
-	revert_panel.visible = false
+	wipe_panels()
 	blame_panel.visible = true
-	merge_panel.visible = false
-	remote_panel.visible = false
 	scan_files()
 	txtBlameFile.text = ""
 ## end view_blame_panel()
@@ -233,23 +232,15 @@ func view_blame_panel():
 
 
 func view_merge_panel():
-	help_panel.visible = false
-	checkout_panel.visible = false
-	revert_panel.visible = false
-	blame_panel.visible = false
+	wipe_panels()
 	merge_panel.visible = true
-	remote_panel.visible = false
 	reset_merge()
 ## end view_merge_panel()
 
 
 
 func view_remote_panel():
-	help_panel.visible = false
-	checkout_panel.visible = false
-	revert_panel.visible = false
-	blame_panel.visible = false
-	merge_panel.visible = false
+	wipe_panels()
 	remote_panel.visible = true
 	txtRemoteMessage.text = ""
 	clear_remote_containers()
