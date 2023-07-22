@@ -1,9 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://xf0386p1spaa"]
+[gd_scene load_steps=11 format=3 uid="uid://xf0386p1spaa"]
 
 [ext_resource type="PackedScene" uid="uid://dnbpfdnleaa1w" path="res://objects/shelf.tscn" id="1_taija"]
 [ext_resource type="PackedScene" uid="uid://cueub72xvc4br" path="res://objects/ground.tscn" id="2_to2me"]
 [ext_resource type="Shader" path="res://materials/sky_box.gdshader" id="3_1yiy2"]
 [ext_resource type="PackedScene" uid="uid://bn0h3w6t5skv4" path="res://objects/user.tscn" id="3_j8huy"]
+[ext_resource type="PackedScene" uid="uid://c2l0udrb40w16" path="res://objects/open_menu.tscn" id="5_iqrkt"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_p2abb"]
 noise_type = 3
@@ -42,3 +43,5 @@ shadow_enabled = true
 
 [node name="user" parent="." instance=ExtResource("3_j8huy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6.90479)
+
+[node name="open_menu" parent="." instance=ExtResource("5_iqrkt")]

@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3 uid="uid://5584ix2lskor"]
+
+[ext_resource type="Script" path="res://scripts/start_menu.gd" id="1_tepr1"]
+[ext_resource type="Texture2D" uid="uid://dbi316vyrvs63" path="res://assets/logo.svg" id="1_xgonj"]
+
+[node name="start_menu" type="CanvasLayer"]
+script = ExtResource("1_tepr1")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Logo" type="Sprite2D" parent="Panel"]
+position = Vector2(188.5, 174)
+scale = Vector2(0.693359, 0.652344)
+texture = ExtResource("1_xgonj")
+
+[node name="start_2d" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 600.0
+offset_top = 130.0
+offset_right = 850.0
+offset_bottom = 175.0
+text = "Work in 2D User Interface"
+
+[node name="start_3d" type="Button" parent="Panel"]
+layout_mode = 0
+offset_left = 600.0
+offset_top = 250.0
+offset_right = 850.0
+offset_bottom = 295.0
+text = "Work in 3D User Interface"

@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://egqkcmaef51t"]
+[gd_scene load_steps=4 format=3 uid="uid://egqkcmaef51t"]
 
 [ext_resource type="Script" path="res://scripts/gui_git.gd" id="1_bfgs3"]
 [ext_resource type="Texture2D" uid="uid://bdagqspkuuci5" path="res://assets/arrow.svg" id="2_retkk"]
+[ext_resource type="PackedScene" uid="uid://c7bwslx8fuwq6" path="res://objects/clone_panel.tscn" id="3_wmdbi"]
 
 [node name="gui-git" type="CanvasLayer"]
 script = ExtResource("1_bfgs3")
@@ -448,47 +449,8 @@ text = "Clone Repository
 layout_mode = 2
 text = "Help"
 
-[node name="clone_panel" type="Panel" parent="application"]
-visible = false
-custom_minimum_size = Vector2(320, 150)
+[node name="clone_panel" parent="application" instance=ExtResource("3_wmdbi")]
 layout_mode = 0
-offset_left = 206.0
-offset_top = 32.0
-offset_right = 526.0
-offset_bottom = 182.0
-
-[node name="Label" type="Label" parent="application/clone_panel"]
-layout_mode = 0
-offset_left = 20.0
-offset_top = 31.0
-offset_right = 60.0
-offset_bottom = 54.0
-text = "From: "
-
-[node name="Label2" type="Label" parent="application/clone_panel"]
-layout_mode = 0
-offset_left = 25.0
-offset_top = 87.0
-offset_right = 65.0
-offset_bottom = 113.0
-text = "To: "
-
-[node name="clone_url" type="TextEdit" parent="application/clone_panel"]
-custom_minimum_size = Vector2(230, 45)
-layout_mode = 0
-offset_left = 69.0
-offset_top = 25.0
-offset_right = 269.0
-offset_bottom = 60.0
-
-[node name="clone_location" type="Button" parent="application/clone_panel"]
-custom_minimum_size = Vector2(200, 26)
-layout_mode = 0
-offset_left = 83.0
-offset_top = 84.0
-offset_right = 283.0
-offset_bottom = 115.0
-text = "Choose Location"
 
 [node name="dialog_panel" type="Panel" parent="application"]
 visible = false
