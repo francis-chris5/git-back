@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://uf3bk6fwcrbg"]
+
+[ext_resource type="PackedScene" uid="uid://b6sjipueecn0h" path="res://blends/branch_box.blend" id="1_n6qpn"]
+[ext_resource type="Script" path="res://scripts/branch_box.gd" id="1_y4p47"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cs0w4"]
+albedo_color = Color(0.647059, 0.513726, 0.239216, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_uj7iv"]
+
+[node name="branch_box" type="CharacterBody3D"]
+script = ExtResource("1_y4p47")
+
+[node name="branch_box" parent="." instance=ExtResource("1_n6qpn")]
+
+[node name="branch_box" parent="branch_box" index="0"]
+surface_material_override/0 = SubResource("StandardMaterial3D_cs0w4")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.50259, 0)
+shape = SubResource("BoxShape3D_uj7iv")
+
+[node name="front_label" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.856689, 0.50684)
+modulate = Color(0.298039, 0.164706, 0.0745098, 1)
+font_size = 16
+
+[node name="rear_label" type="Label3D" parent="."]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0.857, -0.507)
+modulate = Color(0.298039, 0.164706, 0.0745098, 1)
+font_size = 16
+
+[editable path="branch_box"]

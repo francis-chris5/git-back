@@ -3,32 +3,42 @@ Git-Back Version Control Interface Application
 
 
 
-Virtual Reality Interface:
+Virtual-Reality or 3D-World Interface:
 
-	1.)
-		Checkout
-			the branches will be like boxes
-			the commits will be like pieces of paper in the boxes
-
-			grabbing and pulling out a piece of paper checks out that commit
-
-				putting it back in the same box will return from detached head state
-
-				putting it in a new box will create a new branch from that checkout
-
-	2.) 
-		the repository will look like a tree
-		branches that have commits will have leafs/fruit representing the commits
-		tapping a branch will checkout that branch
-		picking a leaf/fruit will checkout that commit
-
-
-	3.) 
-		the repository looks like a clothes line with items hung out to dry
-		branches are different lines things hang on
-		pulling an item off the clothes line checks out the commit it represents (logo on t-shirt or something)
-			put in laundry basket to create a new branch
-			hang back up to return to attached head state
+	CHECKOUT
+		boxes represent branches
+		put box on lower shelf to check out that branch
+		can only remove from shelf if there's another box on the shelf (there must be an active branch)
+		
+		when box on bottom shelf it's [commit objects] show up on top shelf
+		put commit object into [inbox tray] to checkout that commit
+		drop on ground to make new branch from that commit
+		pull out of [inbox tray] to return to attached head state
+	
+	
+	REVERT
+		move commit to [outbox] tray
+		
+		
+	BLAME
+		current commit in [to-do] tray
+		move file to inbox tray
+		
+		
+	MERGE
+		put box on upper shelf to merge branches
+		put both boxes on bottom shelf to cherry pick (pick from right into the left)
+		
+		
+	REMOTE
+		have a door to move boxes through?
+	
+	have a [whiteboard] that displays the "git log --oneline --graph" for active branch
+	
+	active branch/commit/file has a yellow label
+	local branches have a white label
+	remote branches have a blue label
+	
 
 
 
