@@ -1,17 +1,9 @@
-[gd_scene load_steps=12 format=3 uid="uid://xf0386p1spaa"]
+[gd_scene load_steps=10 format=3 uid="uid://xf0386p1spaa"]
 
 [ext_resource type="PackedScene" uid="uid://dnbpfdnleaa1w" path="res://objects/shelf.tscn" id="1_taija"]
-[ext_resource type="PackedScene" uid="uid://uf3bk6fwcrbg" path="res://objects/branch_box.tscn" id="2_3peky"]
+[ext_resource type="PackedScene" uid="uid://cueub72xvc4br" path="res://objects/ground.tscn" id="2_to2me"]
 [ext_resource type="Shader" path="res://materials/sky_box.gdshader" id="3_1yiy2"]
-
-[sub_resource type="PlaneMesh" id="PlaneMesh_tmmsw"]
-size = Vector2(12, 12)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aj4e7"]
-albedo_color = Color(0.172549, 0.305882, 0.215686, 1)
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_s48bd"]
-data = PackedVector3Array(6, 0, 6, -6, 0, 6, 6, 0, -6, -6, 0, 6, -6, 0, -6, 6, 0, -6)
+[ext_resource type="PackedScene" uid="uid://bn0h3w6t5skv4" path="res://objects/user.tscn" id="3_j8huy"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_p2abb"]
 noise_type = 3
@@ -37,35 +29,16 @@ sky = SubResource("Sky_jxt7g")
 
 [node name="world_git" type="Node3D"]
 
-[node name="ground" type="MeshInstance3D" parent="."]
-mesh = SubResource("PlaneMesh_tmmsw")
-surface_material_override/0 = SubResource("StandardMaterial3D_aj4e7")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_wt7nr")
 
-[node name="StaticBody3D" type="StaticBody3D" parent="ground"]
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.223693, 0.503005, -0.834834, 0.130187, 0.864284, 0.485865, 0.965926, 1.58328e-07, -0.258819, 0, 6, 0)
+shadow_enabled = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="ground/StaticBody3D"]
-shape = SubResource("ConcavePolygonShape3D_s48bd")
+[node name="ground" parent="." instance=ExtResource("2_to2me")]
 
 [node name="shelf" parent="." instance=ExtResource("1_taija")]
 
-[node name="branch_box" parent="." instance=ExtResource("2_3peky")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.576862, 0.229647, 0)
-
-[node name="branch_box2" parent="." instance=ExtResource("2_3peky")]
-transform = Transform3D(0.784203, 0, -0.620505, 0, 1, 0, 0.620505, 0, 0.784203, 4.51953, 0.219856, 2.37992)
-
-[node name="branch_box3" parent="." instance=ExtResource("2_3peky")]
-transform = Transform3D(0.449335, 0, -0.893364, 0, 1, 0, 0.893364, 0, 0.449335, -2.2701, 0.267177, 2.31753)
-
-[node name="branch_box4" parent="." instance=ExtResource("2_3peky")]
-transform = Transform3D(-0.669468, 0, 0.742841, 0, 1, 0, -0.742841, 0, -0.669468, 3.31359, 0.871505, 1.68514)
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.911123, 0.182366, -0.369591, 0, 0.896772, 0.442492, 0.412135, -0.403165, 0.81707, -1.84591, 3.23139, 5.36766)
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.223693, 0.503005, -0.834834, 0.130187, 0.864284, 0.485865, 0.965926, 0, -0.258819, 0, 6, 0)
-shadow_enabled = true
-
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_wt7nr")
+[node name="user" parent="." instance=ExtResource("3_j8huy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6.90479)
