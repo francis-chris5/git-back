@@ -142,11 +142,11 @@ func scan_history():
 
 func get_branches():
 	clear_branches()
-	var color = Color(0.29, 0.16, 0.07, 1.0)
 	var results = run_git_command("git branch -a")
 	var branches = results[0].split("\n")
 	branches.remove_at(len(branches)-1)
 	for b in branches:
+		var color = Color(0.29, 0.16, 0.07, 1.0)
 		b = b.lstrip(" ")
 		var boxBranch = branch_box_class.instantiate()
 		if b[0] == "*":
