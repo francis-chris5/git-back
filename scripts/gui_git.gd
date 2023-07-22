@@ -101,6 +101,9 @@ enum remote {PUSH, PULL}
 @onready var txtRemoteMessage = $application/remote_panel/remote_message
 
 
+@onready var btnCurrentRepository = $application/status_bar/current_repository
+
+
 
 
 func _ready():
@@ -129,6 +132,8 @@ func _ready():
 	
 	btnPush.pressed.connect(func(): push_changes())
 	btnPullLatest.pressed.connect(func(): pull_latest())
+	
+	btnCurrentRepository.pressed.connect(func(): open_folder())
 ## end _ready()
 
 
@@ -141,7 +146,7 @@ func run_git_command(command, locale=""):
 	if locale == "":
 		locale = path
 	var results := []
-	var git_command := OS.execute(terminal, ["cd " + locale + "; " + command], results)
+	var git_command := OS.execute(terminal, ["cd '" + locale + "'; " + command], results)
 	return results
 ## end run_git_command()
 
@@ -153,6 +158,13 @@ func run_other_command(command):
 ## end run_other_command()
 
 
+
+func open_folder():
+	run_other_command("cd '" + path + "'; explorer .")
+## end open_folder()
+
+
+
 func open_repository():
 	var results = run_other_command("python ./scripts/open_repository.py")
 	if results[0] == "not a repository\r\n":
@@ -161,9 +173,11 @@ func open_repository():
 		txtMessage.text = "Error, the chosen directory does not appear to be a Git repository"
 		txtMessage.self_modulate = Color(0.78, 0.22, 0.32, 0.9)
 	else:
-		path = results[0]
+		path = results[0].rstrip("\r\n")
 		view_checkout_panel()
 		scan_history()
+		btnCurrentRepository.text = path
+		btnCurrentRepository.disabled = false
 ## end open_repository()
 
 
@@ -306,6 +320,7 @@ func get_branches():
 		b = b.lstrip(" ")
 		var btnBranch = Button.new()
 		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		print(b)
 		if b[0] == "*":
 			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 			b = b.lstrip(" *")
