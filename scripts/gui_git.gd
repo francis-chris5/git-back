@@ -26,12 +26,18 @@ enum remote {PUSH, PULL}
 
 @onready var btnOpen = $application/main_menu/open
 @onready var btnClone = $application/main_menu/clone
+@onready var btnGraph = $application/main_menu/graph
 @onready var btnHelp = $application/main_menu/help
+
 
 
 @onready var clone_panel = $application/clone_panel
 @onready var btnCloneLocation = $application/clone_panel/clone_location
 @onready var txtCloneURL = $application/clone_panel/clone_url
+
+
+@onready var txtGraphView = $application/graph_panel/graph_view
+
 
 
 @onready var btnCheckoutControls = $application/control_options/checkout_controls
@@ -46,6 +52,7 @@ enum remote {PUSH, PULL}
 @onready var blame_panel = $application/blame_panel
 @onready var merge_panel = $application/merge_panel
 @onready var remote_panel = $application/remote_panel
+@onready var graph_panel = $application/graph_panel
 @onready var help_panel = $application/help_panel
 
 @onready var txtManual = $application/help_panel/user_manual
@@ -110,6 +117,7 @@ func _ready():
 	btnOpen.pressed.connect(func(): open_repository())
 	btnClone.pressed.connect(func(): toggle_clone_repository())
 	btnCloneLocation.pressed.connect(func(): choose_location())
+	btnGraph.pressed.connect(func(): toggle_show_graph())
 	btnHelp.pressed.connect(func(): toggle_help_panel())
 	btnCloseMessage.pressed.connect(func(): close_message_panel())
 	
@@ -159,6 +167,29 @@ func run_other_command(command):
 
 
 
+func terminal_coloring(output):
+	output = output.replace("[1m", "[color=white]")
+	output = output.replace("[1;31m", "[color=red]")
+	output = output.replace("[31m", "[color=red]")
+	output = output.replace("[32m", "[color=green]")
+	output = output.replace("[33m", "[color=yellow]")
+	output = output.replace("[34m", "[color=blue]")
+	output = output.replace("[35m", "[color=magenta]")
+	output = output.replace("[36m", "[color=cyan]")
+	output = output.replace("[37m", "[color=lightgray]")
+	output = output.replace("[90m", "[color=gray]")
+	output = output.replace("[91m", "[color=lightred]")
+	output = output.replace("[92m", "[color=lightgreen]")
+	output = output.replace("[93m", "[color=lightyellow]")
+	output = output.replace("[94m", "[color=lightblue]")
+	output = output.replace("[95m", "[color=lightmagenta]")
+	output = output.replace("[96m", "[color=lightcyan]")
+	output = output.replace("[m", "[/color][color=white]")
+	return output
+## end terminal_coloring()
+
+
+
 func open_folder():
 	run_other_command("cd '" + path + "'; explorer .")
 ## end open_folder()
@@ -178,6 +209,7 @@ func open_repository():
 		scan_history()
 		btnCurrentRepository.text = path
 		btnCurrentRepository.disabled = false
+		btnGraph.disabled = false
 ## end open_repository()
 
 
@@ -187,13 +219,25 @@ func toggle_clone_repository():
 
 
 
+func toggle_show_graph():
+	var state = graph_panel.visible
+	wipe_panels()
+	graph_panel.visible = not state
+	if graph_panel.visible:
+		var results = run_git_command("git log --oneline --graph --color")
+		#var results = run_git_command("git log --graph --full-history --all --color --pretty=format:'%x1b[31m%h%x09%x1b[32m%d%x1b[0m%x20%s'")
+		results[0] = terminal_coloring(results[0])
+		txtGraphView.bbcode_text = results[0]
+	else:
+		txtGraphView.text = ""
+## end show_graph()
+
+
+
 func toggle_help_panel():
-	help_panel.visible = not help_panel.visible
-	checkout_panel.visible = false
-	revert_panel.visible = false
-	blame_panel.visible = false
-	merge_panel.visible = false
-	remote_panel.visible = false
+	var state = help_panel.visible
+	wipe_panels()
+	help_panel.visible = not state
 	if help_panel.visible:
 		var manual = FileAccess.get_file_as_string("./assets/user-manual.txt")
 		txtManual.text = manual
@@ -212,6 +256,7 @@ func close_message_panel():
 
 
 func wipe_panels():
+	graph_panel.visible = false
 	help_panel.visible = false
 	checkout_panel.visible = false
 	revert_panel.visible = false
@@ -320,7 +365,6 @@ func get_branches():
 		b = b.lstrip(" ")
 		var btnBranch = Button.new()
 		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		print(b)
 		if b[0] == "*":
 			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 			b = b.lstrip(" *")
@@ -423,6 +467,8 @@ func branch_detatched():
 
 
 func open_log():
+#	var results = run_git_command("git log --color")
+#	results[0] = terminal_coloring(results[0])
 	var results = run_git_command("git log")
 	txtCommit.text = results[0]
 ## end open_log()
@@ -459,11 +505,12 @@ func update_status():
 func show_diff(hash="", branches=[]):
 	var results = []
 	if hash != "":
-		results = run_git_command("git diff " + hash + "^!")
+		results = run_git_command("git diff " + hash + "^! --color")
 	if len(branches):
-		results = run_git_command("git diff " + branches[0] + " " + branches[1])
+		results = run_git_command("git diff " + branches[0] + " " + branches[1] + " --color")
 	txtDiff.text = ""
 	if len(results) > 0:
+		results[0] = terminal_coloring(results[0])
 		txtDiff.text = results[0]
 ## end show_diff()
 
@@ -548,7 +595,8 @@ func preview_revert(hash, button):
 		if rl != null:
 			rl.self_modulate = Color(1.0, 1.0, 1.0, 1.0)
 	button.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
-	var results = run_git_command("git diff " + hash + "^!")
+	var results = run_git_command("git diff " + hash + "^! --color")
+	results[0] = terminal_coloring(results[0])
 	txtRevert.text = results[0]
 	btnRevert.disabled = false
 	hash_to_revert = hash
