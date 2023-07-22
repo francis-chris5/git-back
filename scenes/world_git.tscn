@@ -1,10 +1,10 @@
 [gd_scene load_steps=11 format=3 uid="uid://xf0386p1spaa"]
 
+[ext_resource type="Script" path="res://scripts/world_git.gd" id="1_qv4qe"]
 [ext_resource type="PackedScene" uid="uid://dnbpfdnleaa1w" path="res://objects/shelf.tscn" id="1_taija"]
 [ext_resource type="PackedScene" uid="uid://cueub72xvc4br" path="res://objects/ground.tscn" id="2_to2me"]
 [ext_resource type="Shader" path="res://materials/sky_box.gdshader" id="3_1yiy2"]
 [ext_resource type="PackedScene" uid="uid://bn0h3w6t5skv4" path="res://objects/user.tscn" id="3_j8huy"]
-[ext_resource type="PackedScene" uid="uid://c2l0udrb40w16" path="res://objects/open_menu.tscn" id="5_iqrkt"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_p2abb"]
 noise_type = 3
@@ -29,6 +29,7 @@ background_mode = 2
 sky = SubResource("Sky_jxt7g")
 
 [node name="world_git" type="Node3D"]
+script = ExtResource("1_qv4qe")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_wt7nr")
@@ -44,4 +45,93 @@ shadow_enabled = true
 [node name="user" parent="." instance=ExtResource("3_j8huy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6.90479)
 
-[node name="open_menu" parent="." instance=ExtResource("5_iqrkt")]
+[node name="open_menu" type="CanvasLayer" parent="."]
+
+[node name="open_panel" type="Panel" parent="open_menu"]
+visible = false
+offset_left = 130.0
+offset_top = 100.0
+offset_right = 970.0
+offset_bottom = 440.0
+
+[node name="open_button" type="Button" parent="open_menu/open_panel"]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 55.0
+offset_right = 275.0
+offset_bottom = 100.0
+text = "Open Repository"
+
+[node name="clone_button" type="Button" parent="open_menu/open_panel"]
+layout_mode = 0
+offset_left = 75.0
+offset_top = 150.0
+offset_right = 275.0
+offset_bottom = 195.0
+text = "Clone Repository"
+
+[node name="clone_panel" type="Panel" parent="open_menu/open_panel"]
+visible = false
+layout_mode = 0
+offset_left = 315.0
+offset_top = 145.0
+offset_right = 715.0
+offset_bottom = 265.0
+
+[node name="Label" type="Label" parent="open_menu/open_panel/clone_panel"]
+layout_mode = 0
+offset_left = 25.0
+offset_top = 20.0
+offset_right = 113.0
+offset_bottom = 46.0
+text = "Clone RUL: "
+
+[node name="Label2" type="Label" parent="open_menu/open_panel/clone_panel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 70.0
+offset_right = 101.0
+offset_bottom = 96.0
+text = "Location: 
+"
+
+[node name="repository_url" type="TextEdit" parent="open_menu/open_panel/clone_panel"]
+layout_mode = 0
+offset_left = 115.0
+offset_top = 15.0
+offset_right = 365.0
+offset_bottom = 60.0
+
+[node name="browse_button" type="Button" parent="open_menu/open_panel/clone_panel"]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 70.0
+offset_right = 269.0
+offset_bottom = 101.0
+text = "Choose
+"
+
+[node name="message_panel" type="Panel" parent="open_menu/open_panel"]
+visible = false
+layout_mode = 0
+offset_left = 230.0
+offset_top = 55.0
+offset_right = 630.0
+offset_bottom = 255.0
+
+[node name="message" type="TextEdit" parent="open_menu/open_panel/message_panel"]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 10.0
+offset_right = 350.0
+offset_bottom = 150.0
+editable = false
+wrap_mode = 1
+
+[node name="message_button" type="Button" parent="open_menu/open_panel/message_panel"]
+layout_mode = 0
+offset_left = 275.0
+offset_top = 155.0
+offset_right = 325.0
+offset_bottom = 185.0
+text = "Close Message"

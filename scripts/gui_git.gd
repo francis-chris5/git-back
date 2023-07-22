@@ -30,8 +30,8 @@ enum remote {PUSH, PULL}
 
 
 @onready var clone_panel = $application/clone_panel
-@onready var btnCloneLocation = $application/clone_panel/clone_location
-@onready var txtCloneURL = $application/clone_panel/clone_url
+@onready var btnCloneLocation = $application/clone_panel/browse_button
+@onready var txtCloneURL = $application/clone_panel/repository_url
 
 
 @onready var btnCheckoutControls = $application/control_options/checkout_controls
@@ -320,7 +320,6 @@ func get_branches():
 		b = b.lstrip(" ")
 		var btnBranch = Button.new()
 		btnBranch.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		print(b)
 		if b[0] == "*":
 			btnBranch.self_modulate = Color(0.65, 0.65, 0.02, 1.0)
 			b = b.lstrip(" *")

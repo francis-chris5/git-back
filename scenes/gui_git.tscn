@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://egqkcmaef51t"]
+[gd_scene load_steps=3 format=3 uid="uid://egqkcmaef51t"]
 
 [ext_resource type="Script" path="res://scripts/gui_git.gd" id="1_bfgs3"]
 [ext_resource type="Texture2D" uid="uid://bdagqspkuuci5" path="res://assets/arrow.svg" id="2_retkk"]
-[ext_resource type="PackedScene" uid="uid://c7bwslx8fuwq6" path="res://objects/clone_panel.tscn" id="3_wmdbi"]
 
 [node name="gui-git" type="CanvasLayer"]
 script = ExtResource("1_bfgs3")
@@ -449,8 +448,45 @@ text = "Clone Repository
 layout_mode = 2
 text = "Help"
 
-[node name="clone_panel" parent="application" instance=ExtResource("3_wmdbi")]
+[node name="clone_panel" type="Panel" parent="application"]
+visible = false
+offset_left = 315.0
+offset_top = 145.0
+offset_right = 715.0
+offset_bottom = 265.0
+
+[node name="Label" type="Label" parent="application/clone_panel"]
 layout_mode = 0
+offset_left = 25.0
+offset_top = 20.0
+offset_right = 113.0
+offset_bottom = 46.0
+text = "Clone RUL: "
+
+[node name="Label2" type="Label" parent="application/clone_panel"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = 70.0
+offset_right = 101.0
+offset_bottom = 96.0
+text = "Location: 
+"
+
+[node name="repository_url" type="TextEdit" parent="application/clone_panel"]
+layout_mode = 0
+offset_left = 115.0
+offset_top = 15.0
+offset_right = 365.0
+offset_bottom = 60.0
+
+[node name="browse_button" type="Button" parent="application/clone_panel"]
+layout_mode = 0
+offset_left = 204.0
+offset_top = 70.0
+offset_right = 269.0
+offset_bottom = 101.0
+text = "Choose
+"
 
 [node name="dialog_panel" type="Panel" parent="application"]
 visible = false

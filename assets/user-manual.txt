@@ -1,95 +1,103 @@
 
 Git-Back
-	GUI Application for managing Version Control in Git-SCM Repositories
+	Application for managing Version Control in Git-SCM Repositories
+		(with both 2D and 3D user interfaces)
+
+
+2D INTERFACE
+------------
+		Opening a local repository
+			click the "Open" button and a file explorer will open
+			navigate to the directory contianing the desired git repository
+				(nothing will open if the .git hidden folder is not in this directory)
+			begin the version control management tasks for this repository
 
 
 
-Opening a local repository
-	click the "Open" button and a file explorer will open
-	navigate to the directory contianing the desired git repository
-		(nothing will open if the .git hidden folder is not in this directory)
-	begin the version control management tasks for this repository
+		Cloning a remote repository
+			click the "Clone Repository" button and a small dialog will open beside it
+			paste or type the Clone URL for the remote repository into the "From" text entry box
+			click the "Choose" button to select the parent directory the local clone of the repository will be created in
+				(give it time to download as internet connection speeds may vary and some repositories may take a while to download anyway)
+			begin the version control management tasks for this repository
+
+
+		Checkout a commit
+			use the lefthand navigation buttons to open the "Checkout" panel
+			click on the button labeled with the commit you want to checkout (commit buttons are in the second column at top)
+			while in the detached head state:
+				1.) above the status in the lower left of the Checkout Panel is a button to return to the attached head state
+				2.) above the commit log text box there is a button to break off as an independent branch originating at this commit
+					(enter a name for the new branch in the text entry box, if blank it will receive the name "From_<HASH>")
 
 
 
-Cloning a remote repository
-	click the "Clone Repository" button and a small dialog will open beside it
-	paste or type the Clone URL for the remote repository into the "From" text entry box
-	click the "Choose" button to select the parent directory the local clone of the repository will be created in
-		(give it time to download as internet connection speeds may vary and some repositories may take a while to download anyway)
-	begin the version control management tasks for this repository
-
-
-Checkout a commit
-	use the lefthand navigation buttons to open the "Checkout" panel
-	click on the button labeled with the commit you want to checkout (commit buttons are in the second column at top)
-	while in the detached head state:
-		1.) above the status in the lower left of the Checkout Panel is a button to return to the attached head state
-		2.) above the commit log text box there is a button to break off as an independent branch originating at this commit
-			(enter a name for the new branch in the text entry box, if blank it will receive the name "From_<HASH>")
+		Checkout a branch
+			use the lefthand navigation buttons to open the "Checkout" panel
+			click on the button labeled with the branch name you want to checkout (branch buttons are in the first column at top)
+			if remote branches exist they will be shown in blue, clicking one will create a local version of that branch
+			to create a new branch break it off from an exisiting commit (see "Checkout a commit" above)
 
 
 
-Checkout a branch
-	use the lefthand navigation buttons to open the "Checkout" panel
-	click on the button labeled with the branch name you want to checkout (branch buttons are in the first column at top)
-	if remote branches exist they will be shown in blue, clicking one will create a local version of that branch
-	to create a new branch break it off from an exisiting commit (see "Checkout a commit" above)
+		Revert a commit
+			use the lefthand navigation buttons to open the "Revert" panel
+			click the button labeled with the commit you want to revert
+				(the differences applied in that particular commit will appear in the text box)
+			click the "Revert" button to create a new commit undoing all of those changes
 
 
 
-Revert a commit
-	use the lefthand navigation buttons to open the "Revert" panel
-	click the button labeled with the commit you want to revert
-		(the differences applied in that particular commit will appear in the text box)
-	click the "Revert" button to create a new commit undoing all of those changes
+		View Git Blame on the tracked files
+			use the lefthand navigation buttons to open the "Revert" panel
+			click the button labeled with the filename you want to view the blame for
+				(the git blame output will appear in the text box)
 
 
 
-View Git Blame on the tracked files
-	use the lefthand navigation buttons to open the "Revert" panel
-	click the button labeled with the filename you want to view the blame for
-		(the git blame output will appear in the text box)
+		Merge Branches
+			use the lefthand navigation buttons to open the "Merge" panel
+			click the "Branch" button located at the top left of the Merge Panel
+			click the button labled with the branch you want to merge into the active branch
+				(to merge into a different branch checkout the branch you want to merge into --see "Checkout Branch" above)
+				(to merge a remote branch checkout the remote branch to create a local version and then checkout the branch you want to merge it into --see "Checkout Branch" above)
+			click the "Pull Request" button to preview the merge, results will show in the text box
+			if the preview checks out click confirm to complete the merge, otherwise resolve conflicts and then repeat the pull request
+				(if Git-Back application will be closed prior to completing the merge it is advisable to abort the merge before continueing)
 
 
 
-Merge Branches
-	use the lefthand navigation buttons to open the "Merge" panel
-	click the "Branch" button located at the top left of the Merge Panel
-	click the button labled with the branch you want to merge into the active branch
-		(to merge into a different branch checkout the branch you want to merge into --see "Checkout Branch" above)
-		(to merge a remote branch checkout the remote branch to create a local version and then checkout the branch you want to merge it into --see "Checkout Branch" above)
-	click the "Pull Request" button to preview the merge, results will show in the text box
-	if the preview checks out click confirm to complete the merge, otherwise resolve conflicts and then repeat the pull request
-		(if Git-Back application will be closed prior to completing the merge it is advisable to abort the merge before continueing)
+		Cherry Pick Commits to merge
+			use the lefthand navigation buttons to open the "Merge" panel
+			click the "Cherry Pick" button located at the top left of the Merge Panel
+			choose the branch the changes from the desired commit will move to
+			choose the commit to be moved to the other branch
+			click the "Pull Request" button to cherry pick the particular commit
+				(there is no confirmation or preview for cherry picking built into git)
 
 
 
-Cherry Pick Commits to merge
-	use the lefthand navigation buttons to open the "Merge" panel
-	click the "Cherry Pick" button located at the top left of the Merge Panel
-	choose the branch the changes from the desired commit will move to
-	choose the commit to be moved to the other branch
-	click the "Pull Request" button to cherry pick the particular commit
-		(there is no confirmation or preview for cherry picking built into git)
+		Pull latest version from a remote repository
+			The "Remote" button in the lefthand navigation options will only be present if the repository is connected to a remote origin
+			use the lefthand navigation buttons to open the "Remote" panel
+			choose the branch to pull from the remote repository
+				(choosing a remote connection which doesn't exist locally does work, give it ample time to download from the remote repository)
+			activate the "Allow Unrelated Histories" if the local repository has a different history than the remote repository
+			click the "Pull Latest" button to pull the changes
 
 
 
-Pull latest version from a remote repository
-	The "Remote" button in the lefthand navigation options will only be present if the repository is connected to a remote origin
-	use the lefthand navigation buttons to open the "Remote" panel
-	choose the branch to pull from the remote repository
-		(choosing a remote connection which doesn't exist locally does work, give it ample time to download from the remote repository)
-	activate the "Allow Unrelated Histories" if the local repository has a different history than the remote repository
-	click the "Pull Latest" button to pull the changes
+		Push latest changes to a remote repository
+			The "Remote" button in the lefthand navigation options will only be present if the repository is connected to a remote origin
+			use the lefthand navigation buttons to open the "Remote" panel
+			pushing to a remote repository requires you to have permission to and your access to it be set in your local git configurations
+				(only the active branch can be pushed to the remote repository to push a different branch either checkout that branch or create a new one --see "Checkout Branch" above)
+			click the "Push Changes" button when you are ready to push the local changes to the remote repository
+				(give it ample time to upload based on your network connections before doing more work on the repository)
 
 
 
-Push latest changes to a remote repository
-	The "Remote" button in the lefthand navigation options will only be present if the repository is connected to a remote origin
-	use the lefthand navigation buttons to open the "Remote" panel
-	pushing to a remote repository requires you to have permission to and your access to it be set in your local git configurations
-		(only the active branch can be pushed to the remote repository to push a different branch either checkout that branch or create a new one --see "Checkout Branch" above)
-	click the "Push Changes" button when you are ready to push the local changes to the remote repository
-		(give it ample time to upload based on your network connections before doing more work on the repository)
-
+3D INTERFACE
+------------
+		Open/Clone a repository menu
+			press [ctrl] + [o] to toggle the open and clone hud menu
