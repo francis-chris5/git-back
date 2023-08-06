@@ -19,6 +19,7 @@ var branch_box_class = preload("res://objects/branch_box.tscn")
 @onready var message_panel = $open_menu/open_panel/message_panel
 @onready var txtMessage = $open_menu/open_panel/message_panel/message
 @onready var btnCloseMessage = $open_menu/open_panel/message_panel/message_button
+@onready var active_branch_locale = $active_branch_locale
 
 
 
@@ -164,8 +165,12 @@ func get_branches():
 		if bb != null:
 			add_child(bb)
 			bb.show_name()
-			bb.position = Vector3(-4-3*j, 0, 7-2*i)
-			bb.rotation.y += deg_to_rad(90)
+			if bb.branch_name == current_branch:
+				bb.position = Vector3(-0.65, 0.15, 0)
+				bb.rotation = Vector3.ZERO
+			else:
+				bb.position = Vector3(-4-3*j, 0, 7-2*i)
+				bb.rotation.y += deg_to_rad(90)
 			i += 1
 			if i > 6:
 				i = 0
